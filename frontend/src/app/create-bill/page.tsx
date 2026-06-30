@@ -119,7 +119,7 @@ export default function CreateBillPage() {
       })
 
       // บันทึกบิลลงในประวัติผู้สร้าง (localStorage)
-      if (typeof globalThis.window !== "undefined") {
+      if (globalThis.window !== undefined) {
         try {
           const recentBills = JSON.parse(localStorage.getItem("recent_bills") || "[]")
           if (!recentBills.some((b: { slug: string }) => b.slug === response.publicSlug)) {
