@@ -1,35 +1,26 @@
 "use client"
 
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect } from "react"
 import { useParams } from "next/navigation"
 import Link from "next/link"
-import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 import { billApi, paymentApi, uploadSlip } from "@/lib/api"
 import { useToast } from "@/hooks/use-toast"
-import {
-  ArrowLeft, QrCode, Lock, Unlock, BarChart3,
-  Upload, Copy, Check, Eye, RefreshCw, FileText,
-  Image as ImageIcon, ChevronDown, ChevronUp
-} from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { ArrowLeft, Lock, Unlock, Copy, Check, FileText } from "lucide-react"
 import QRCode from "qrcode"
-import { ThemeToggle } from "@/components/theme-toggle"
 import { MainLayout } from "@/layout/main-layout"
+
+// นำเข้า Local Components ย่อย
+import { BillItem, BillItemCard } from "./components/bill-item-card"
+import { VerifySlipDialog } from "./components/verify-slip-dialog"
+import { SlipPreviewDialog } from "./components/slip-preview-dialog"
+import { QrDialog } from "./components/qr-dialog"
+import { AdminPanel } from "./components/admin-panel"
 
 // ============================================================
 // Interfaces
 // ============================================================
-interface BillItem {
-  id: number
-  displayName: string
-  amount: number
-  status: "PAID" | "PENDING" | "UNPAID"
-  referenceCode?: string
-}
-
 interface Bill {
   id: number
   title: string
@@ -50,124 +41,6 @@ interface PaymentHistory {
 }
 
 // ============================================================
-// Component: BillItemCard — Card แต่ละคนในบิล
-// ============================================================
-function BillItemCard({
-  item,
-  billStatus,
-  onViewQR,
-  onUploadSlip,
-  onViewSlip,
-}: {
-  item: BillItem
-  billStatus: "OPEN" | "CLOSED"
-  onViewQR: (id: number) => void
-  onUploadSlip: (item: BillItem) => void
-  onViewSlip: (id: number) => void
-}) {
-  const [expanded, setExpanded] = useState(false)
-
-  // กำหนด badge และสีตามสถานะ
-  const statusConfig = {
-    PAID: {
-      badge: "จ่ายแล้ว ✓",
-      badgeClass: "bg-emerald-500/10 border-emerald-500/30 text-emerald-400",
-      cardBorder: "border-l-4 border-l-emerald-500/40",
-    },
-    PENDING: {
-      badge: "รอยืนยัน...",
-      badgeClass: "bg-amber-500/10 border-amber-500/30 text-amber-400",
-      cardBorder: "border-l-4 border-l-amber-500/40",
-    },
-    UNPAID: {
-      badge: "ยังไม่จ่าย",
-      badgeClass: "bg-rose-500/10 border-rose-500/30 text-rose-400",
-      cardBorder: "border-l-4 border-l-rose-500/20",
-    },
-  }
-
-  const cfg = statusConfig[item.status]
-
-  return (
-    <div className={`bg-card border border-border rounded-2xl overflow-hidden ${cfg.cardBorder}`}>
-      {/* แถวหลัก — กดเพื่อขยาย/ซ่อนปุ่ม */}
-      <button
-        className="w-full flex items-center gap-3 px-4 py-3.5 text-left active:bg-secondary/50 transition-colors"
-        onClick={() => setExpanded((v) => !v)}
-      >
-        {/* ชื่อ + ยอด */}
-        <div className="flex-1 min-w-0">
-          <p className="font-bold text-foreground text-sm truncate">{item.displayName}</p>
-          <p className="text-lg font-mono font-black text-foreground mt-0.5">
-            ฿{item.amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}
-          </p>
-        </div>
-
-        {/* สถานะ + ลูกศร */}
-        <div className="flex items-center gap-2 flex-shrink-0">
-          <Badge className={`${cfg.badgeClass} text-[11px] h-6 px-2`}>{cfg.badge}</Badge>
-          {expanded
-            ? <ChevronUp className="h-4 w-4 text-muted-foreground" />
-            : <ChevronDown className="h-4 w-4 text-muted-foreground" />
-          }
-        </div>
-      </button>
-
-      {/* ส่วนขยาย — ปุ่ม Action */}
-      {expanded && (
-        <div className="border-t border-border/50 px-4 py-3 bg-secondary/20 flex items-center gap-2 animate-in slide-in-from-top-1 duration-150">
-          {/* ปุ่ม QR Code */}
-          <button
-            onClick={() => onViewQR(item.id)}
-            className="
-              flex-1 h-11 rounded-xl flex items-center justify-center gap-1.5
-              bg-indigo-500/10 border border-indigo-500/25
-              text-indigo-400 text-xs font-bold
-              hover:bg-indigo-500/20 active:scale-95 transition-all
-            "
-          >
-            <QrCode className="h-4 w-4" />
-            QR จ่ายเงิน
-          </button>
-
-          {/* ปุ่มอัปโหลดสลิป */}
-          {item.status !== "PAID" && billStatus === "OPEN" && (
-            <button
-              onClick={() => onUploadSlip(item)}
-              className="
-                flex-1 h-11 rounded-xl flex items-center justify-center gap-1.5
-                bg-emerald-500/10 border border-emerald-500/25
-                text-emerald-400 text-xs font-bold
-                hover:bg-emerald-500/20 active:scale-95 transition-all
-              "
-            >
-              <Upload className="h-4 w-4" />
-              แนบสลิป
-            </button>
-          )}
-
-          {/* ปุ่มดูสลิป */}
-          {(item.status === "PAID" || item.status === "PENDING") && (
-            <button
-              onClick={() => onViewSlip(item.id)}
-              className="
-                flex-1 h-11 rounded-xl flex items-center justify-center gap-1.5
-                bg-secondary border border-border
-                text-muted-foreground text-xs font-bold
-                hover:bg-secondary/80 active:scale-95 transition-all
-              "
-            >
-              <Eye className="h-4 w-4" />
-              ดูสลิป
-            </button>
-          )}
-        </div>
-      )}
-    </div>
-  )
-}
-
-// ============================================================
 // Main Page
 // ============================================================
 export default function ViewBillPage() {
@@ -184,15 +57,6 @@ export default function ViewBillPage() {
   const [qrDialog, setQrDialog] = useState<{ open: boolean; data?: { amount?: number; referenceCode?: string }; qrImage?: string; loading?: boolean }>({ open: false })
   const [uploadDialog, setUploadDialog] = useState<{ open: boolean; item?: BillItem; loading?: boolean }>({ open: false })
   const [slipPreviewDialog, setSlipPreviewDialog] = useState<{ open: boolean; slipUrl?: string; bankRef?: string; amount?: number; loading?: boolean }>({ open: false })
-
-  // สถานะการอัปโหลดสลิป
-  const [selectedFile, setSelectedFile] = useState<File | null>(null)
-  const [filePreview, setFilePreview] = useState<string | null>(null)
-  const [mockingScan, setMockingScan] = useState(false)
-  const [detectedAmount, setDetectedAmount] = useState("")
-  const [bankRef, setBankRef] = useState("")
-
-  const fileInputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
     if (slug) fetchBill()
@@ -256,54 +120,19 @@ export default function ViewBillPage() {
 
   // เปิดโมดัลอัปโหลดสลิป
   const handleUploadSlipOpen = (item: BillItem) => {
-    setSelectedFile(null)
-    setFilePreview(null)
-    setDetectedAmount("")
-    setBankRef("")
     setUploadDialog({ open: true, item, loading: false })
   }
 
-  // จัดการเลือกไฟล์รูปภาพ
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (file) {
-      setSelectedFile(file)
-      const reader = new FileReader()
-      reader.onloadend = () => setFilePreview(reader.result as string)
-      reader.readAsDataURL(file)
-    }
-  }
-
-  // จำลองการสแกนสลิป (Mock OCR)
-  const handleMockScan = () => {
-    if (!selectedFile) {
-      toast({ title: "ไม่พบไฟล์", description: "กรุณาเลือกไฟล์สลิปก่อน", variant: "destructive" })
-      return
-    }
-    setMockingScan(true)
-    setTimeout(() => {
-      const mockRef = "TRN" + Math.floor(1000000000 + Math.random() * 9000000000).toString()
-      setBankRef(mockRef)
-      setDetectedAmount((uploadDialog.item?.amount || 0).toString())
-      setMockingScan(false)
-      toast({ title: "สแกนสำเร็จ (จำลอง)!", description: "กรอกข้อมูลจากสลิปอัตโนมัติแล้ว" })
-    }, 1500)
-  }
-
   // ส่งข้อมูลชำระเงินไป Backend
-  const handlePaymentSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    if (!selectedFile) return toast({ title: "เกิดข้อผิดพลาด", description: "กรุณาแนบไฟล์สลิป", variant: "destructive" })
-    if (!bankRef || !detectedAmount) return toast({ title: "เกิดข้อผิดพลาด", description: "กรุณากรอกรหัสอ้างอิงและจำนวนเงิน", variant: "destructive" })
-
+  const handlePaymentSubmit = async (file: File, ref: string, amount: string) => {
     setUploadDialog((d) => ({ ...d, loading: true }))
     try {
-      const uploadedUrl = await uploadSlip(selectedFile)
+      const uploadedUrl = await uploadSlip(file)
       await paymentApi.createPayment({
         billItemId: uploadDialog.item!.id,
         slipUrl: uploadedUrl,
-        bankRef,
-        detectedAmount: parseFloat(detectedAmount)
+        bankRef: ref,
+        detectedAmount: parseFloat(amount)
       })
       toast({ title: "อัปโหลดสลิปเรียบร้อย!", description: "ตรวจสอบความถูกต้องสำเร็จ" })
       setUploadDialog({ open: false })
@@ -311,7 +140,7 @@ export default function ViewBillPage() {
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : "ไม่ทราบสาเหตุ"
       toast({ title: "อัปโหลดล้มเหลว", description: msg, variant: "destructive" })
-      setUploadDialog((d) => ({ ...d, loading: false }))
+      setUploadDialog((d) => ({ ...d, loading: false, item: d.item }))
     }
   }
 
@@ -389,56 +218,47 @@ export default function ViewBillPage() {
     )
   }
   return (
-    <MainLayout
-      customHeader={
-        <header className="sticky top-0 z-50 w-full border-b border-border/60 bg-background/80 backdrop-blur-md">
-          <div className="max-w-lg mx-auto px-4 h-14 flex items-center justify-between gap-3">
-            <div className="flex items-center gap-2 min-w-0">
-              <Link href="/">
-                <button
-                  aria-label="ย้อนกลับ"
-                  className="
-                    w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0
-                    bg-secondary/60 border border-border
-                    hover:bg-secondary active:scale-95 transition-all
-                    text-muted-foreground hover:text-foreground
-                  "
-                >
-                  <ArrowLeft className="h-5 w-5" />
-                </button>
-              </Link>
-              <div className="min-w-0">
-                <h1 className="text-sm font-black text-foreground truncate">{bill.title}</h1>
-                <p className="text-[10px] text-muted-foreground font-mono">#{bill.publicSlug}</p>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-2 flex-shrink-0">
-              {/* Badge สถานะบิล */}
-              {bill.status === "OPEN" ? (
-                <Badge className="bg-emerald-500/10 border-emerald-500/30 text-emerald-400 text-[11px] gap-1">
-                  <Unlock className="h-3 w-3" /> เปิดอยู่
-                </Badge>
-              ) : (
-                <Badge className="bg-secondary border-border text-muted-foreground text-[11px] gap-1">
-                  <Lock className="h-3 w-3" /> ปิดแล้ว
-                </Badge>
-              )}
-              <ThemeToggle />
-            </div>
+    <MainLayout>
+      <div className="flex items-center justify-between gap-3 mb-2">
+        <div className="flex items-center gap-2 min-w-0">
+          <Link href="/">
+            <button
+              aria-label="ย้อนกลับ"
+              className="
+                w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0
+                bg-secondary/60 border border-border
+                hover:bg-secondary active:scale-95 transition-all
+                text-muted-foreground hover:text-foreground
+              "
+            >
+              <ArrowLeft className="h-5 w-5" />
+            </button>
+          </Link>
+          <div className="min-w-0">
+            <h1 className="text-base font-bold text-foreground truncate">{bill.title}</h1>
+            <p className="text-xs text-muted-foreground font-mono">#{bill.publicSlug}</p>
           </div>
-        </header>
-      }
-    >
+        </div>
 
-        {/* --- Progress Bar --- */}
+        <div className="flex items-center gap-2 flex-shrink-0">
+          {bill.status === "OPEN" ? (
+            <Badge className="bg-emerald-500/10 border-emerald-500/30 text-emerald-400 text-xs gap-1 font-semibold">
+              <Unlock className="h-3 w-3" /> เปิดอยู่
+            </Badge>
+          ) : (
+            <Badge className="bg-secondary border-border text-muted-foreground text-xs gap-1 font-semibold">
+              <Lock className="h-3 w-3" /> ปิดแล้ว
+            </Badge>
+          )}
+        </div>
+      </div>
+
         <div className="bg-card border border-border p-4 rounded-2xl space-y-3">
           <div className="flex items-center justify-between">
             <span className="text-xs font-bold text-muted-foreground">ความคืบหน้า</span>
-            <span className="text-sm font-black text-indigo-400">{progressPercent}%</span>
+            <span className="text-sm font-bold text-indigo-400">{progressPercent}%</span>
           </div>
 
-          {/* แถบ progress */}
           <div className="w-full bg-secondary h-2.5 rounded-full overflow-hidden">
             <div
               className="bg-gradient-to-r from-indigo-500 to-violet-500 h-full rounded-full transition-all duration-700"
@@ -446,36 +266,32 @@ export default function ViewBillPage() {
             />
           </div>
 
-          {/* สรุปตัวเลข */}
           <div className="grid grid-cols-3 gap-2 pt-1">
             <div className="text-center">
-              <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider">รวม</p>
-              <p className="text-sm font-mono font-black text-foreground">฿{total.toLocaleString(undefined, { minimumFractionDigits: 0 })}</p>
+              <p className="text-xs font-semibold text-muted-foreground/80">รวม</p>
+              <p className="text-sm font-mono font-bold text-foreground">฿{total.toLocaleString(undefined, { minimumFractionDigits: 0 })}</p>
             </div>
             <div className="text-center border-x border-border/50">
-              <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider">จ่ายแล้ว</p>
-              <p className="text-sm font-mono font-black text-emerald-400">฿{paid.toLocaleString(undefined, { minimumFractionDigits: 0 })}</p>
+              <p className="text-xs font-semibold text-muted-foreground/80">จ่ายแล้ว</p>
+              <p className="text-sm font-mono font-bold text-emerald-400">฿{paid.toLocaleString(undefined, { minimumFractionDigits: 0 })}</p>
             </div>
             <div className="text-center">
-              <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider">คงเหลือ</p>
-              <p className="text-sm font-mono font-black text-indigo-400">฿{(total - paid).toLocaleString(undefined, { minimumFractionDigits: 0 })}</p>
+              <p className="text-xs font-semibold text-muted-foreground/80">คงเหลือ</p>
+              <p className="text-sm font-mono font-bold text-indigo-400">฿{(total - paid).toLocaleString(undefined, { minimumFractionDigits: 0 })}</p>
             </div>
           </div>
 
-          {/* แถบ pending ถ้ามี */}
           {pending > 0 && (
             <div className="flex items-center justify-between bg-amber-500/8 border border-amber-500/20 rounded-xl px-3 py-2">
               <span className="text-[11px] text-amber-400 font-bold">⏳ รอยืนยัน</span>
-              <span className="text-[11px] font-mono font-black text-amber-400">฿{pending.toLocaleString(undefined, { minimumFractionDigits: 0 })}</span>
+              <span className="text-xs font-mono font-bold text-amber-400">฿{pending.toLocaleString(undefined, { minimumFractionDigits: 0 })}</span>
             </div>
           )}
         </div>
 
-        {/* --- ข้อมูลพร้อมเพย์ + เครื่องมือ --- */}
         <div className="grid grid-cols-2 gap-3">
-          {/* PromptPay ID + Payee Name */}
           <div className="bg-card border border-border rounded-2xl p-3 flex flex-col justify-center min-w-0">
-            <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-0.5">ผู้รับเงิน</p>
+            <p className="text-xs font-semibold text-muted-foreground/80 mb-0.5">ผู้รับเงิน</p>
             {bill.payeeName ? (
               <>
                 <p className="text-xs font-bold text-foreground truncate leading-snug">{bill.payeeName}</p>
@@ -486,7 +302,6 @@ export default function ViewBillPage() {
             )}
           </div>
 
-          {/* ปุ่มแชร์ */}
           <button
             onClick={handleCopyLink}
             className="
@@ -498,17 +313,16 @@ export default function ViewBillPage() {
           >
             <div className="flex items-center gap-1.5">
               {copied ? <Check className="h-4 w-4 text-emerald-400" /> : <Copy className="h-4 w-4 text-indigo-400" />}
-              <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
+              <span className="text-xs font-semibold text-muted-foreground/80">
                 {copied ? "คัดลอกแล้ว!" : "แชร์ลิงก์"}
               </span>
             </div>
-            <p className="text-xs text-foreground font-bold mt-1">
+            <p className="text-xs text-foreground font-semibold mt-1">
               {copied ? "ลิงก์อยู่ในคลิปบอร์ด" : "กดเพื่อคัดลอก URL"}
             </p>
           </button>
         </div>
 
-        {/* --- รายชื่อผู้ร่วมบิล (Card per person) --- */}
         <div className="space-y-2">
           <div className="flex items-center justify-between px-1">
             <h2 className="text-sm font-bold text-foreground">
@@ -533,277 +347,45 @@ export default function ViewBillPage() {
           </div>
         </div>
 
-        {/* --- เครื่องมือจัดการบิล (สำหรับผู้สร้าง) --- */}
-        <div className="space-y-2">
-          <h2 className="text-sm font-bold text-foreground px-1">เครื่องมือจัดการ</h2>
-          <div className="grid grid-cols-2 gap-3">
-            <Link href={`/bills/${slug}/summary`} className="block">
-              <button className="
-                w-full h-12 rounded-2xl border border-border
-                bg-card flex items-center justify-center gap-2
-                text-sm font-bold text-foreground
-                hover:border-indigo-500/40 hover:bg-secondary/50
-                active:scale-[0.98] transition-all
-              ">
-                <BarChart3 className="h-4 w-4 text-indigo-400" />
-                ดูรายงาน
-              </button>
-            </Link>
-
-            {bill.status === "OPEN" && (
-              <button
-                onClick={handleCloseBill}
-                disabled={closingBill}
-                className="
-                  w-full h-12 rounded-2xl border border-rose-500/20
-                  bg-rose-500/8 flex items-center justify-center gap-2
-                  text-sm font-bold text-rose-400
-                  hover:bg-rose-500/15 active:scale-[0.98] transition-all
-                  disabled:opacity-50
-                "
-              >
-                <Lock className="h-4 w-4" />
-                {closingBill ? "กำลังปิด..." : "ปิดบิล"}
-              </button>
-            )}
-          </div>
-        </div>
+        <AdminPanel
+          slug={slug}
+          billStatus={bill.status}
+          closingBill={closingBill}
+          onCloseBill={handleCloseBill}
+        />
 
         <div className="h-2" />
 
-      {/* ================================================================
-          DIALOG 1: QR Code พร้อมเพย์
-          ================================================================ */}
-      <Dialog open={qrDialog.open} onOpenChange={(o) => setQrDialog({ ...qrDialog, open: o })}>
-        <DialogContent className="bg-card border-border text-foreground max-w-[340px] mx-auto rounded-3xl">
-          <DialogHeader>
-            <DialogTitle className="text-foreground flex items-center gap-2">
-              <QrCode className="h-5 w-5 text-indigo-400" /> QR จ่ายเงิน
-            </DialogTitle>
-            <DialogDescription className="text-muted-foreground text-xs">
-              เปิดแอปธนาคารสแกนเพื่อโอนเงินได้ทันที
-            </DialogDescription>
-          </DialogHeader>
+        {/* DIALOG 1: QR Code พร้อมเพย์ */}
+        <QrDialog
+          isOpen={qrDialog.open}
+          onOpenChange={(o) => setQrDialog((prev) => ({ ...prev, open: o }))}
+          loading={qrDialog.loading || false}
+          qrImage={qrDialog.qrImage || null}
+          payeeName={bill.payeeName}
+          payeePromptPayId={bill.payeePromptPayId}
+          amount={qrDialog.data ? (qrDialog.data.amount || null) : null}
+          referenceCode={qrDialog.data ? (qrDialog.data.referenceCode || null) : null}
+        />
 
-          <div className="flex flex-col items-center gap-4">
-            {qrDialog.loading ? (
-              <div className="py-12 flex flex-col items-center gap-3">
-                <div className="w-10 h-10 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center animate-pulse">
-                  <QrCode className="h-5 w-5 text-indigo-400" />
-                </div>
-                <p className="text-muted-foreground text-sm animate-pulse">กำลังสร้าง QR Code...</p>
-              </div>
-            ) : (
-              qrDialog.qrImage && (
-                <div className="w-full max-w-[260px] bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-xl flex flex-col items-center animate-in zoom-in duration-200">
-                  <img src="/images/thai_qr_payment.png" alt="Thai QR Payment" className="w-full h-auto object-contain" />
-                  <div className="relative w-full bg-white">
-                    <img src={qrDialog.qrImage} alt="PromptPay QR" className="w-full h-auto block" />
-                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white p-[3px] rounded-lg shadow-sm">
-                      <img src="/images/icon-thaiqr.png" alt="Thai QR Icon" className="w-8 h-8 object-contain" />
-                    </div>
-                  </div>
-                </div>
-              )
-            )}
+        {/* DIALOG 2: อัปโหลดสลิป */}
+        <VerifySlipDialog
+          isOpen={uploadDialog.open}
+          onOpenChange={(o) => setUploadDialog((prev) => ({ ...prev, open: o }))}
+          item={uploadDialog.item || null}
+          loading={uploadDialog.loading || false}
+          onSubmit={handlePaymentSubmit}
+        />
 
-            {qrDialog.data && (
-              <div className="w-full bg-background border border-border rounded-2xl p-3.5 space-y-2 text-xs font-medium">
-                {bill.payeeName && (
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">ผู้รับเงิน:</span>
-                    <span className="text-foreground font-bold">{bill.payeeName}</span>
-                  </div>
-                )}
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">พร้อมเพย์:</span>
-                  <span className="text-foreground font-mono">{bill.payeePromptPayId}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">จำนวนเงิน:</span>
-                  <span className="text-emerald-400 font-black font-mono">
-                    ฿{qrDialog.data.amount?.toLocaleString(undefined, { minimumFractionDigits: 2 })}
-                  </span>
-                </div>
-                <div className="flex justify-between border-t border-border pt-2 font-mono">
-                  <span className="text-muted-foreground">รหัสอ้างอิง:</span>
-                  <span className="text-foreground text-[10px] break-all max-w-[55%] text-right">
-                    {qrDialog.data.referenceCode}
-                  </span>
-                </div>
-              </div>
-            )}
-          </div>
-        </DialogContent>
-      </Dialog>
-
-      {/* ================================================================
-          DIALOG 2: อัปโหลดสลิป
-          ================================================================ */}
-      <Dialog open={uploadDialog.open} onOpenChange={(o) => setUploadDialog({ ...uploadDialog, open: o })}>
-        <DialogContent className="bg-card border-border text-foreground max-w-[380px] mx-auto rounded-3xl">
-          <DialogHeader>
-            <DialogTitle className="text-foreground flex items-center gap-2">
-              <Upload className="h-5 w-5 text-emerald-400" />
-              ยืนยันการจ่าย — {uploadDialog.item?.displayName}
-            </DialogTitle>
-            <DialogDescription className="text-muted-foreground text-xs">
-              แนบสลิปและตรวจสอบข้อมูลก่อนยืนยัน
-            </DialogDescription>
-          </DialogHeader>
-
-          <form onSubmit={handlePaymentSubmit} className="space-y-4">
-            {/* พื้นที่อัปโหลดรูปสลิป */}
-            <div
-              onClick={() => fileInputRef.current?.click()}
-              className="
-                border-2 border-dashed border-border hover:border-emerald-500/50
-                bg-background rounded-2xl p-5
-                flex flex-col items-center justify-center gap-2
-                cursor-pointer transition-all min-h-[120px]
-              "
-            >
-              <input
-                type="file"
-                ref={fileInputRef}
-                onChange={handleFileChange}
-                accept="image/*"
-                required
-                className="hidden"
-              />
-              {filePreview ? (
-                <div className="w-full max-h-[140px] overflow-hidden rounded-xl flex items-center justify-center">
-                  <img src={filePreview} alt="Slip preview" className="object-contain max-h-[140px] rounded-xl" />
-                </div>
-              ) : (
-                <>
-                  <ImageIcon className="h-8 w-8 text-muted-foreground/40" />
-                  <span className="text-xs text-muted-foreground text-center">
-                    แตะที่นี่เพื่อเลือกรูปสลิป<br />
-                    <span className="text-[10px] opacity-60">จากกล้องหรือแกลเลอรี</span>
-                  </span>
-                </>
-              )}
-            </div>
-
-            {/* ปุ่มสแกน Mock OCR */}
-            {selectedFile && (
-              <button
-                type="button"
-                onClick={handleMockScan}
-                disabled={mockingScan}
-                className="
-                  w-full h-11 rounded-xl border border-indigo-500/25
-                  bg-indigo-500/8 text-indigo-400 text-xs font-bold
-                  flex items-center justify-center gap-2
-                  hover:bg-indigo-500/15 active:scale-[0.98] transition-all
-                  disabled:opacity-50
-                "
-              >
-                <RefreshCw className={`h-3.5 w-3.5 ${mockingScan ? "animate-spin" : ""}`} />
-                {mockingScan ? "กำลังสแกน..." : "🔍 สแกนและกรอกข้อมูลอัตโนมัติ"}
-              </button>
-            )}
-
-            {/* ฟิลด์กรอกข้อมูล */}
-            <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-1.5">
-                <Label htmlFor="bankRef" className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider">
-                  รหัสอ้างอิง
-                </Label>
-                <Input
-                  id="bankRef"
-                  value={bankRef}
-                  onChange={(e) => setBankRef(e.target.value)}
-                  placeholder="Ref ID"
-                  required
-                  className="h-11 bg-secondary/40 border-border font-mono text-sm rounded-xl"
-                />
-              </div>
-              <div className="space-y-1.5">
-                <Label htmlFor="detectedAmount" className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider">
-                  ยอดเงิน (฿)
-                </Label>
-                <Input
-                  id="detectedAmount"
-                  type="number"
-                  inputMode="decimal"
-                  step="0.01"
-                  value={detectedAmount}
-                  onChange={(e) => setDetectedAmount(e.target.value)}
-                  placeholder="0.00"
-                  required
-                  className="h-11 bg-secondary/40 border-border font-mono text-sm rounded-xl"
-                />
-              </div>
-            </div>
-
-            {/* ปุ่มยืนยัน */}
-            <Button
-              type="submit"
-              disabled={uploadDialog.loading}
-              className="
-                w-full h-12 bg-gradient-to-r from-emerald-600 to-teal-600
-                hover:from-emerald-500 hover:to-teal-500
-                border-none text-white rounded-2xl font-bold
-                shadow-lg shadow-emerald-600/10
-                active:scale-[0.98] disabled:opacity-60 transition-all
-              "
-            >
-              {uploadDialog.loading ? "กำลังบันทึก..." : "✓ ยืนยันการชำระเงิน"}
-            </Button>
-          </form>
-        </DialogContent>
-      </Dialog>
-
-      {/* ================================================================
-          DIALOG 3: พรีวิวสลิป
-          ================================================================ */}
-      <Dialog open={slipPreviewDialog.open} onOpenChange={(o) => setSlipPreviewDialog({ ...slipPreviewDialog, open: o })}>
-        <DialogContent className="bg-card border-border text-foreground max-w-[340px] mx-auto rounded-3xl">
-          <DialogHeader>
-            <DialogTitle className="text-foreground flex items-center gap-2">
-              <FileText className="h-5 w-5 text-indigo-400" /> สลิปการชำระเงิน
-            </DialogTitle>
-          </DialogHeader>
-
-          <div className="space-y-4">
-            {slipPreviewDialog.loading ? (
-              <div className="py-12 text-center">
-                <p className="text-muted-foreground text-sm animate-pulse">กำลังดึงข้อมูล...</p>
-              </div>
-            ) : (
-              <>
-                {slipPreviewDialog.slipUrl && (
-                  <div className="bg-background border border-border rounded-2xl p-2.5 flex items-center justify-center max-h-[260px] overflow-hidden">
-                    <img
-                      src={slipPreviewDialog.slipUrl}
-                      alt="Payment Slip"
-                      className="object-contain max-h-[250px] rounded-xl"
-                    />
-                  </div>
-                )}
-                <div className="bg-background border border-border rounded-2xl p-3.5 space-y-2 text-xs">
-                  <div className="flex justify-between items-center">
-                    <span className="text-muted-foreground">สถานะ:</span>
-                    <Badge className="bg-emerald-500/10 border-emerald-500/30 text-emerald-400 h-5 text-[10px]">อนุมัติแล้ว ✓</Badge>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">ยอดเงิน:</span>
-                    <span className="text-emerald-400 font-mono font-black">
-                      ฿{slipPreviewDialog.amount?.toLocaleString(undefined, { minimumFractionDigits: 2 })}
-                    </span>
-                  </div>
-                  <div className="flex justify-between border-t border-border pt-2 font-mono">
-                    <span className="text-muted-foreground">รหัสทำรายการ:</span>
-                    <span className="text-foreground text-[10px] break-all max-w-[55%] text-right">{slipPreviewDialog.bankRef}</span>
-                  </div>
-                </div>
-              </>
-            )}
-          </div>
-        </DialogContent>
-      </Dialog>
-    </MainLayout>
-  )
-}
+        {/* DIALOG 3: พรีวิวสลิป */}
+        <SlipPreviewDialog
+          isOpen={slipPreviewDialog.open}
+          onOpenChange={(o) => setSlipPreviewDialog((prev) => ({ ...prev, open: o }))}
+          loading={slipPreviewDialog.loading || false}
+          slipUrl={slipPreviewDialog.slipUrl || null}
+          amount={slipPreviewDialog.amount || null}
+          bankRef={slipPreviewDialog.bankRef || null}
+        />
+      </MainLayout>
+    )
+  }
