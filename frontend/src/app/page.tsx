@@ -91,46 +91,48 @@ export default function HomePage() {
 
         {/* การ์ด: ค้นหาบิลเดิมด้วยรหัส */}
         <div className="
-          flex items-center gap-3 p-4 rounded-2xl
+          p-4 rounded-2xl
           bg-card border border-border
-          shadow-sm
+          shadow-sm space-y-3
         ">
-          <div className="bg-secondary p-2.5 rounded-xl flex-shrink-0">
-            <Search className="h-5 w-5 text-indigo-400" />
-          </div>
-          <div className="flex-1 min-w-0">
-            {/* ขยายหัวข้อการ์ดให้อ่านง่ายขึ้น */}
-            <p className="font-bold text-foreground text-base mb-2">ดูบิลเดิมด้วยรหัส</p>
-            <div className="flex gap-2">
-              <input
-                id="slug-input"
-                type="text"
-                inputMode="text"
-                placeholder="ใส่รหัสบิล เช่น 3a2c5f10"
-                value={slug}
-                onChange={(e) => setSlug(e.target.value)}
-                onKeyDown={(e) => { if (e.key === "Enter") handleSearch() }}
-                className="
-                  flex-1 h-11 px-3 rounded-xl text-base
-                  bg-background border border-border
-                  focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/50
-                  text-foreground placeholder:text-muted-foreground/85
-                  transition-all outline-none
-                "
-              />
-              <Button
-                onClick={handleSearch}
-                disabled={!slug.trim()}
-                className="
-                  h-11 px-4 rounded-xl
-                  bg-indigo-600 hover:bg-indigo-500 text-white
-                  disabled:opacity-40 transition-all
-                  flex-shrink-0
-                "
-              >
-                <Search className="h-4 w-4" />
-              </Button>
+          {/* หัวข้อและไอคอนประกอบด้านบนเพื่อความเรียบร้อยและสื่อความหมายชัดเจน */}
+          <div className="flex items-center gap-2 px-1">
+            <div className="bg-indigo-500/10 p-1.5 rounded-lg border border-indigo-500/15">
+              <Search className="h-4 w-4 text-indigo-400" />
             </div>
+            <p className="font-bold text-foreground text-sm">ดูบิลเดิมด้วยรหัส</p>
+          </div>
+          
+          {/* ช่องกรอกข้อมูลและปุ่มค้นหาจัดเรียงแนวนอนแบบเต็มหน้ากว้าง */}
+          <div className="flex gap-2">
+            <input
+              id="slug-input"
+              type="text"
+              inputMode="text"
+              placeholder="ใส่รหัสบิล เช่น 3a2c5f10"
+              value={slug}
+              onChange={(e) => setSlug(e.target.value)}
+              onKeyDown={(e) => { if (e.key === "Enter") handleSearch() }}
+              className="
+                flex-1 h-11 px-3.5 rounded-xl text-sm
+                bg-background border border-border
+                focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/50
+                text-foreground placeholder:text-muted-foreground/70
+                transition-all outline-none
+              "
+            />
+            <Button
+              onClick={handleSearch}
+              disabled={!slug.trim()}
+              className="
+                h-11 px-4.5 rounded-xl
+                bg-indigo-600 hover:bg-indigo-500 text-white
+                disabled:opacity-40 transition-all
+                flex-shrink-0 text-sm font-semibold
+              "
+            >
+              ค้นหา
+            </Button>
           </div>
         </div>
       </div>
