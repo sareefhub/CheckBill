@@ -8,9 +8,10 @@ import { Footer } from "@/components/footer"
 interface MainLayoutProps {
   readonly children: React.ReactNode
   readonly customHeader?: React.ReactNode
+  readonly customFooter?: React.ReactNode
 }
 
-export function MainLayout({ children, customHeader }: MainLayoutProps) {
+export function MainLayout({ children, customHeader, customFooter }: MainLayoutProps) {
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col relative">
 
@@ -28,7 +29,7 @@ export function MainLayout({ children, customHeader }: MainLayoutProps) {
         {children}
       </main>
 
-      <Footer />
+      {customFooter ?? <Footer />}
     </div>
   )
 }

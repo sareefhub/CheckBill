@@ -135,7 +135,6 @@ export default function CreateBillPage() {
 
   return (
     <MainLayout>
-
       {/* small page header (inside main layout) */}
       <div className="flex items-center gap-2 mb-2">
         <Link href="/">
@@ -162,7 +161,6 @@ export default function CreateBillPage() {
           ================================================================ */}
       <form onSubmit={handleSubmit} className="flex-1 flex flex-col">
         <div className="flex-1 pt-5 pb-4 relative z-10 space-y-4">
-
           {/* --- Section: ข้อมูลบิลหลัก --- */}
           <div className="bg-card border border-border rounded-2xl p-4 space-y-4 shadow-sm relative overflow-hidden">
             {/* กล่องไอคอนและหัวข้อการ์ดเพื่อความเป็นระบบและระเบียบสายตา */}
@@ -242,7 +240,7 @@ export default function CreateBillPage() {
               </button>
             </div>
 
-            {/* แถวแนะนำหัวคอลัมน์ (ช่วยให้อ่านง่ายขึ้นและประหยัดพื้นที่แนวตั้ง ไม่เกิด Label ซ้ำกันในลูป) */}
+            {/* แถวแนะนำหัวคอลัมน์ */}
             <div className="px-4 pt-3 pb-1 flex items-center gap-2 text-[10px] font-bold text-muted-foreground/75 uppercase tracking-wider bg-secondary/20 border-b border-border/30">
               <div className="w-6 flex-shrink-0 text-center">#</div>
               <div className="flex-1 pl-1">ชื่อเพื่อน</div>
@@ -331,9 +329,6 @@ export default function CreateBillPage() {
               </div>
             )}
           </div>
-
-          {/* padding เว้นพื้นที่ให้ sticky button */}
-          <div className="h-2" />
         </div>
 
         {/* ================================================================

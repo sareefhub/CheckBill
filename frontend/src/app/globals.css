@@ -175,10 +175,11 @@
     padding-right: env(safe-area-inset-right);
   }
 
-  /* ปรับ scroll ให้ smooth บนทุก platform */
+  /* ปรับ scroll ให้ smooth บนทุก platform และป้องกัน Layout Shift จากแถบ Scrollbar ขยับเวลาเปลี่ยนหน้า */
   html {
     scroll-behavior: smooth;
     -webkit-text-size-adjust: 100%;
+    scrollbar-gutter: stable;
   }
 
   /* ป้องกัน input zoom บน iOS (ต้องใช้ font-size >= 16px) */
