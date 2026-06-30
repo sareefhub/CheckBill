@@ -1,0 +1,26 @@
+import { Navbar } from "@/components/navbar"
+import { Footer } from "@/components/footer"
+
+// ============================================================
+// MainLayout — โครงสร้างหลักของทุกหน้า
+// รวม Navbar, พื้นหลังตกแต่ง, และ Footer ไว้ในที่เดียว
+// ============================================================
+export function MainLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="min-h-screen bg-background text-foreground flex flex-col relative overflow-hidden">
+
+      {/* === แสงตกแต่งพื้นหลัง === */}
+      <div className="absolute top-[-10%] left-[-10%] w-[60%] h-[60%] rounded-full bg-indigo-500/8 blur-[120px] pointer-events-none dark:bg-indigo-500/10" />
+      <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] rounded-full bg-violet-500/8 blur-[120px] pointer-events-none dark:bg-violet-500/10" />
+
+      <Navbar />
+
+      {/* เนื้อหาหลักของแต่ละหน้า */}
+      <main className="flex-1 max-w-lg mx-auto w-full px-4 pt-6 pb-safe-lg relative z-10 space-y-6">
+        {children}
+      </main>
+
+      <Footer />
+    </div>
+  )
+}
