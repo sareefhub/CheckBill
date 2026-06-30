@@ -67,10 +67,14 @@ export default function CreateBillPage() {
     setLoading(true)
     try {
       if (!billData.title.trim()) {
-        return toast({ title: "ข้อมูลไม่ครบถ้วน", description: "กรุณาใส่ชื่อบิลก่อนสร้างนะครับ", variant: "destructive" })
+        toast({ title: "ข้อมูลไม่ครบถ้วน", description: "กรุณาใส่ชื่อบิลก่อนสร้างนะครับ", variant: "destructive" })
+        setLoading(false)
+        return
       }
       if (!billData.payeePromptPayId.trim()) {
-        return toast({ title: "ข้อมูลไม่ครบถ้วน", description: "กรุณาใส่เบอร์พร้อมเพย์สำหรับรับเงินนะครับ", variant: "destructive" })
+        toast({ title: "ข้อมูลไม่ครบถ้วน", description: "กรุณาใส่เบอร์พร้อมเพย์สำหรับรับเงินนะครับ", variant: "destructive" })
+        setLoading(false)
+        return
       }
 
       const validItems = billData.items.filter(
@@ -81,7 +85,9 @@ export default function CreateBillPage() {
       )
 
       if (validItems.length === 0) {
-        return toast({ title: "ข้อมูลไม่ครบถ้วน", description: "กรุณาใส่รายการผู้ร่วมจ่ายอย่างน้อย 1 คนขึ้นไปนะครับ", variant: "destructive" })
+        toast({ title: "ข้อมูลไม่ครบถ้วน", description: "กรุณาใส่รายการผู้ร่วมจ่ายอย่างน้อย 1 คนขึ้นไปนะครับ", variant: "destructive" })
+        setLoading(false)
+        return
       }
 
       const apiData = {
@@ -122,7 +128,6 @@ export default function CreateBillPage() {
     } catch (err: unknown) {
       const errorMessage = err instanceof Error ? err.message : "ไม่สามารถสร้างบิลได้"
       toast({ title: "เกิดข้อผิดพลาด", description: errorMessage, variant: "destructive" })
-    } finally {
       setLoading(false)
     }
   }
@@ -135,35 +140,36 @@ export default function CreateBillPage() {
 
   return (
     <MainLayout>
-      {/* small page header (inside main layout) */}
+      {/* ส่วนหัวหน้าจอ (ย้อนกลับ / สร้างบิลใหม่) */}
       <div className="flex items-center gap-2 mb-2">
         <Link href="/">
           <button
+            type="button"
             aria-label="ย้อนกลับ"
-            className={`
+            className="
               w-10 h-10 rounded-xl flex items-center justify-center
               bg-secondary/60 border border-border
               hover:bg-secondary transition-all active:scale-95
               text-muted-foreground hover:text-foreground
-            `}
+            "
           >
             <ArrowLeft className="h-5 w-5" />
           </button>
         </Link>
         <div>
           <h1 className="text-base font-black text-foreground">สร้างบิลใหม่</h1>
-          <p className="text-[11px] text-muted-foreground leading-none">ใส่ข้อมูลบิลและรายชื่อเพื่อน</p>
+          <p className="text-xs text-muted-foreground/90 mt-0.5">ใส่ข้อมูลบิลและรายชื่อเพื่อน</p>
         </div>
       </div>
 
       {/* ================================================================
-          FORM CONTENT
+          ฟอร์มกรอกข้อมูล
           ================================================================ */}
       <form onSubmit={handleSubmit} className="flex-1 flex flex-col">
         <div className="flex-1 pt-5 pb-4 relative z-10 space-y-4">
-          {/* --- Section: ข้อมูลบิลหลัก --- */}
+          
+          {/* --- การ์ดหลัก: ข้อมูลบิลหลัก --- */}
           <div className="bg-card border border-border rounded-2xl p-4 space-y-4 shadow-sm relative overflow-hidden">
-            {/* กล่องไอคอนและหัวข้อการ์ดเพื่อความเป็นระบบและระเบียบสายตา */}
             <div className="flex items-center gap-2 px-0.5">
               <div className="bg-indigo-500/10 p-1.5 rounded-lg border border-indigo-500/15">
                 <Wallet className="h-4 w-4 text-indigo-400" />
@@ -173,7 +179,7 @@ export default function CreateBillPage() {
 
             {/* ชื่อบิล */}
             <div className="space-y-1.5">
-              <Label htmlFor="title" className="text-[11px] font-bold text-muted-foreground/80 pl-0.5 uppercase tracking-wider">
+              <Label htmlFor="title" className="text-xs font-bold text-muted-foreground/90 pl-0.5">
                 ชื่อบิลเรียกเก็บ
               </Label>
               <Input
@@ -193,7 +199,7 @@ export default function CreateBillPage() {
 
             {/* เบอร์พร้อมเพย์ */}
             <div className="space-y-1.5">
-              <Label htmlFor="promptpay" className="text-[11px] font-bold text-muted-foreground/80 pl-0.5 uppercase tracking-wider flex items-center gap-1.5">
+              <Label htmlFor="promptpay" className="text-xs font-bold text-muted-foreground/90 pl-0.5 flex items-center gap-1.5">
                 <Phone className="h-3 w-3" /> เบอร์พร้อมเพย์ผู้รับเงิน
               </Label>
               <Input
@@ -213,7 +219,7 @@ export default function CreateBillPage() {
             </div>
           </div>
 
-          {/* --- Section: รายชื่อเพื่อน --- */}
+          {/* --- การ์ดรอง: รายชื่อเพื่อน --- */}
           <div className="bg-card border border-border rounded-2xl shadow-sm overflow-hidden">
             <div className="px-4 pt-4 pb-3 border-b border-border/50 flex items-center justify-between">
               <div className="flex items-center gap-2">
@@ -221,7 +227,7 @@ export default function CreateBillPage() {
                   <UserPlus className="h-4 w-4 text-indigo-400" />
                 </div>
                 <span className="text-sm font-bold text-foreground">รายชื่อเพื่อน</span>
-                <span className="bg-indigo-500/10 border border-indigo-500/25 text-indigo-400 text-[10px] font-bold px-2.5 py-0.5 rounded-full">
+                <span className="bg-indigo-500/10 border border-indigo-500/25 text-indigo-400 text-xs font-bold px-2.5 py-0.5 rounded-full">
                   {billData.items.length} คน
                 </span>
               </div>
@@ -240,8 +246,8 @@ export default function CreateBillPage() {
               </button>
             </div>
 
-            {/* แถวแนะนำหัวคอลัมน์ */}
-            <div className="px-4 pt-3 pb-1 flex items-center gap-2 text-[10px] font-bold text-muted-foreground/75 uppercase tracking-wider bg-secondary/20 border-b border-border/30">
+            {/* แถวแนะนำหัวคอลัมน์ (ปรับปรุงให้อ่านภาษาไทยง่ายขึ้น ไม่มี uppercase และ tracking-wider) */}
+            <div className="px-4 pt-2.5 pb-1 flex items-center gap-2 text-xs font-bold text-muted-foreground bg-secondary/20 border-b border-border/30">
               <div className="w-6 flex-shrink-0 text-center">#</div>
               <div className="flex-1 pl-1">ชื่อเพื่อน</div>
               <div className="w-24 pl-1">ยอดเงิน (บาท)</div>
