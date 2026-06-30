@@ -5,7 +5,12 @@ import { Footer } from "@/components/footer"
 // MainLayout — โครงสร้างหลักของทุกหน้า
 // รวม Navbar, พื้นหลังตกแต่ง, และ Footer ไว้ในที่เดียว
 // ============================================================
-export function MainLayout({ children }: { readonly children: React.ReactNode }) {
+interface MainLayoutProps {
+  readonly children: React.ReactNode
+  readonly customHeader?: React.ReactNode
+}
+
+export function MainLayout({ children, customHeader }: MainLayoutProps) {
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col relative">
 
@@ -16,7 +21,7 @@ export function MainLayout({ children }: { readonly children: React.ReactNode })
         <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] rounded-full bg-violet-500/8 blur-[120px] dark:bg-violet-500/10" />
       </div>
 
-      <Navbar />
+      {customHeader ?? <Navbar />}
 
       {/* เนื้อหาหลักของแต่ละหน้า */}
       <main className="flex-1 max-w-lg mx-auto w-full px-4 pt-6 pb-safe-lg relative z-10 space-y-6">

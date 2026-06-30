@@ -17,6 +17,7 @@ import {
 } from "lucide-react"
 import QRCode from "qrcode"
 import { ThemeToggle } from "@/components/theme-toggle"
+import { MainLayout } from "@/layout/main-layout"
 
 // ============================================================
 // Interfaces
@@ -388,57 +389,47 @@ export default function ViewBillPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background text-foreground flex flex-col">
+    <MainLayout
+      customHeader={
+        <header className="sticky top-0 z-50 w-full border-b border-border/60 bg-background/80 backdrop-blur-md">
+          <div className="max-w-lg mx-auto px-4 h-14 flex items-center justify-between gap-3">
+            <div className="flex items-center gap-2 min-w-0">
+              <Link href="/">
+                <button
+                  aria-label="ย้อนกลับ"
+                  className="
+                    w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0
+                    bg-secondary/60 border border-border
+                    hover:bg-secondary active:scale-95 transition-all
+                    text-muted-foreground hover:text-foreground
+                  "
+                >
+                  <ArrowLeft className="h-5 w-5" />
+                </button>
+              </Link>
+              <div className="min-w-0">
+                <h1 className="text-sm font-black text-foreground truncate">{bill.title}</h1>
+                <p className="text-[10px] text-muted-foreground font-mono">#{bill.publicSlug}</p>
+              </div>
+            </div>
 
-      {/* === แสงตกแต่งพื้นหลัง === */}
-      <div className="fixed top-[-15%] left-[-10%] w-[50%] h-[50%] rounded-full bg-indigo-500/5 blur-[130px] pointer-events-none" />
-      <div className="fixed bottom-[-10%] right-[-10%] w-[45%] h-[45%] rounded-full bg-violet-500/5 blur-[120px] pointer-events-none" />
-
-      {/* ================================================================
-          HEADER — sticky top
-          ================================================================ */}
-      <header className="sticky top-0 z-50 w-full border-b border-border/60 bg-background/80 backdrop-blur-md">
-        <div className="max-w-lg mx-auto px-4 h-14 flex items-center justify-between gap-3">
-          <div className="flex items-center gap-2 min-w-0">
-            <Link href="/">
-              <button
-                aria-label="ย้อนกลับ"
-                className="
-                  w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0
-                  bg-secondary/60 border border-border
-                  hover:bg-secondary active:scale-95 transition-all
-                  text-muted-foreground hover:text-foreground
-                "
-              >
-                <ArrowLeft className="h-5 w-5" />
-              </button>
-            </Link>
-            <div className="min-w-0">
-              <h1 className="text-sm font-black text-foreground truncate">{bill.title}</h1>
-              <p className="text-[10px] text-muted-foreground font-mono">#{bill.publicSlug}</p>
+            <div className="flex items-center gap-2 flex-shrink-0">
+              {/* Badge สถานะบิล */}
+              {bill.status === "OPEN" ? (
+                <Badge className="bg-emerald-500/10 border-emerald-500/30 text-emerald-400 text-[11px] gap-1">
+                  <Unlock className="h-3 w-3" /> เปิดอยู่
+                </Badge>
+              ) : (
+                <Badge className="bg-secondary border-border text-muted-foreground text-[11px] gap-1">
+                  <Lock className="h-3 w-3" /> ปิดแล้ว
+                </Badge>
+              )}
+              <ThemeToggle />
             </div>
           </div>
-
-          <div className="flex items-center gap-2 flex-shrink-0">
-            {/* Badge สถานะบิล */}
-            {bill.status === "OPEN" ? (
-              <Badge className="bg-emerald-500/10 border-emerald-500/30 text-emerald-400 text-[11px] gap-1">
-                <Unlock className="h-3 w-3" /> เปิดอยู่
-              </Badge>
-            ) : (
-              <Badge className="bg-secondary border-border text-muted-foreground text-[11px] gap-1">
-                <Lock className="h-3 w-3" /> ปิดแล้ว
-              </Badge>
-            )}
-            <ThemeToggle />
-          </div>
-        </div>
-      </header>
-
-      {/* ================================================================
-          MAIN CONTENT
-          ================================================================ */}
-      <main className="flex-1 max-w-lg mx-auto w-full px-4 pt-5 pb-safe-lg relative z-10 space-y-4">
+        </header>
+      }
+    >
 
         {/* --- Progress Bar --- */}
         <div className="bg-card border border-border p-4 rounded-2xl space-y-3">
@@ -572,7 +563,6 @@ export default function ViewBillPage() {
         </div>
 
         <div className="h-2" />
-      </main>
 
       {/* ================================================================
           DIALOG 1: QR Code พร้อมเพย์
@@ -714,7 +704,7 @@ export default function ViewBillPage() {
                   onChange={(e) => setBankRef(e.target.value)}
                   placeholder="Ref ID"
                   required
-                  className="h-11 bg-background border-border font-mono text-sm rounded-xl"
+                  className="h-11 bg-secondary/40 border-border font-mono text-sm rounded-xl"
                 />
               </div>
               <div className="space-y-1.5">
@@ -730,7 +720,7 @@ export default function ViewBillPage() {
                   onChange={(e) => setDetectedAmount(e.target.value)}
                   placeholder="0.00"
                   required
-                  className="h-11 bg-background border-border font-mono text-sm rounded-xl"
+                  className="h-11 bg-secondary/40 border-border font-mono text-sm rounded-xl"
                 />
               </div>
             </div>
@@ -801,6 +791,6 @@ export default function ViewBillPage() {
           </div>
         </DialogContent>
       </Dialog>
-    </div>
+    </MainLayout>
   )
 }

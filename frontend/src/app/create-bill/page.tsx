@@ -186,7 +186,7 @@ export default function CreateBillPage() {
                   onChange={(e) => setBillData((prev) => ({ ...prev, title: e.target.value }))}
                   required
                   className="
-                    h-12 bg-background border-border
+                    h-12 bg-secondary/40 border-border
                     focus:border-indigo-500/70 focus:ring-1 focus:ring-indigo-500/50
                     text-foreground placeholder:text-muted-foreground/60
                     rounded-xl transition-all font-medium
@@ -207,7 +207,7 @@ export default function CreateBillPage() {
                   onChange={(e) => setBillData((prev) => ({ ...prev, payeePromptPayId: e.target.value }))}
                   required
                   className="
-                    h-12 bg-background border-border
+                    h-12 bg-secondary/40 border-border
                     focus:border-indigo-500/70 focus:ring-1 focus:ring-indigo-500/50
                     text-foreground placeholder:text-muted-foreground/60
                     rounded-xl transition-all font-mono
@@ -265,7 +265,7 @@ export default function CreateBillPage() {
                       onChange={(e) => updateItem(index, "name", e.target.value)}
                       required
                       className="
-                        h-11 bg-background border-border
+                        h-11 bg-secondary/40 border-border
                         focus:border-indigo-500/60 focus:ring-1 focus:ring-indigo-500/50
                         text-foreground placeholder:text-muted-foreground/60
                         rounded-xl text-sm
@@ -288,7 +288,7 @@ export default function CreateBillPage() {
                       onChange={(e) => updateItem(index, "amount", e.target.value)}
                       required
                       className="
-                        h-11 bg-background border-border
+                        h-11 bg-secondary/40 border-border
                         focus:border-indigo-500/60 focus:ring-1 focus:ring-indigo-500/50
                         text-foreground placeholder:text-muted-foreground/60
                         rounded-xl font-mono text-sm
