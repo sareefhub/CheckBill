@@ -3,15 +3,17 @@
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Plus, Trash2, ArrowLeft, Sparkles, UserPlus, Coins, Wallet } from "lucide-react"
+import { Plus, Trash2, ArrowLeft, UserPlus, Coins, Wallet, Phone } from "lucide-react"
 import Link from "next/link"
 import { billApi } from "@/lib/api"
 import { useToast } from "@/hooks/use-toast"
+import { ThemeToggle } from "@/components/theme-toggle"
 
-// กำหนดประเภทข้อมูลของรายการเพื่อนผู้ร่วมจ่าย
+// ============================================================
+// ประเภทข้อมูลรายการเพื่อนผู้ร่วมจ่าย
+// ============================================================
 type BillItem = {
   name: string
   amount: string
@@ -33,7 +35,7 @@ export default function CreateBillPage() {
     items: [{ name: "", amount: "" }],
   })
 
-  // ฟังก์ชันเพิ่มรายการเพื่อนใหม่
+  // เพิ่มรายการเพื่อนใหม่
   const addItem = () => {
     setBillData((prev) => ({
       ...prev,
@@ -41,7 +43,7 @@ export default function CreateBillPage() {
     }))
   }
 
-  // ฟังก์ชันลบเพื่อนตามดัชนี
+  // ลบเพื่อนตามดัชนี
   const removeItem = (index: number) => {
     setBillData((prev) => ({
       ...prev,
@@ -49,7 +51,7 @@ export default function CreateBillPage() {
     }))
   }
 
-  // ฟังก์ชันอัปเดตข้อมูลของช่องกรอกแต่ละตัวในแถวเพื่อน
+  // อัปเดตข้อมูลในแต่ละแถวเพื่อน
   const updateItem = (index: number, field: keyof BillItem, value: string) => {
     setBillData((prev) => ({
       ...prev,
@@ -59,7 +61,7 @@ export default function CreateBillPage() {
     }))
   }
 
-  // ฟังก์ชันตรวจสอบและส่งข้อมูลไปสร้างบิลที่ backend API
+  // ตรวจสอบและส่งข้อมูลสร้างบิลไป backend
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     setLoading(true)
@@ -102,7 +104,7 @@ export default function CreateBillPage() {
       if (typeof window !== "undefined") {
         try {
           const recentBills = JSON.parse(localStorage.getItem("recent_bills") || "[]")
-          if (!recentBills.some((b: any) => b.slug === response.publicSlug)) {
+          if (!recentBills.some((b: { slug: string }) => b.slug === response.publicSlug)) {
             recentBills.unshift({
               slug: response.publicSlug,
               title: billData.title.trim(),
@@ -125,192 +127,246 @@ export default function CreateBillPage() {
     }
   }
 
-  // คำนวณยอดเงินรวมจำลองขณะกรอก
+  // คำนวณยอดเงินรวมขณะกรอก
   const temporaryTotal = billData.items.reduce((sum, item) => {
     const val = parseFloat(item.amount)
     return isNaN(val) ? sum : sum + val
   }, 0)
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 relative overflow-hidden pb-16">
-      {/* แสงสปอตไลท์ระยิบระยับพื้นหลัง */}
-      <div className="absolute top-[-25%] left-[-10%] w-[60%] h-[60%] rounded-full bg-indigo-500/5 blur-[150px] pointer-events-none" />
-      <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] rounded-full bg-violet-500/5 blur-[130px] pointer-events-none" />
+    <div className="min-h-screen bg-background text-foreground flex flex-col">
 
-      <div className="container mx-auto px-4 py-8 relative z-10 max-w-2xl">
-        
-        {/* ส่วนหัวหน้าเว็บและปุ่มย้อนกลับ */}
-        <div className="mb-8">
-          <Link href="/">
-            <Button variant="ghost" className="mb-6 text-slate-400 hover:text-white hover:bg-slate-900/60 rounded-xl px-3 h-10 transition-all">
-              <ArrowLeft className="h-4 w-4 mr-2" /> ย้อนกลับหน้าหลัก
-            </Button>
-          </Link>
-          <div className="flex items-center gap-3">
-            <div className="bg-gradient-to-r from-indigo-500/10 to-violet-500/10 p-3 rounded-2xl border border-indigo-500/20 shadow-inner">
-              <Sparkles className="h-6 w-6 text-indigo-400" />
-            </div>
+      {/* === แสงตกแต่งพื้นหลัง === */}
+      <div className="fixed top-[-25%] left-[-10%] w-[60%] h-[60%] rounded-full bg-indigo-500/6 blur-[150px] pointer-events-none dark:bg-indigo-500/5" />
+      <div className="fixed bottom-[-10%] right-[-10%] w-[50%] h-[50%] rounded-full bg-violet-500/6 blur-[130px] pointer-events-none dark:bg-violet-500/5" />
+
+      {/* ================================================================
+          HEADER — sticky top
+          ================================================================ */}
+      <header className="sticky top-0 z-50 w-full border-b border-border/60 bg-background/80 backdrop-blur-md">
+        <div className="max-w-lg mx-auto px-4 h-14 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Link href="/">
+              <button
+                aria-label="ย้อนกลับ"
+                className="
+                  w-10 h-10 rounded-xl flex items-center justify-center
+                  bg-secondary/60 border border-border
+                  hover:bg-secondary transition-all active:scale-95
+                  text-muted-foreground hover:text-foreground
+                "
+              >
+                <ArrowLeft className="h-5 w-5" />
+              </button>
+            </Link>
             <div>
-              <h1 className="text-3xl md:text-4xl font-black tracking-tight bg-gradient-to-r from-white via-slate-100 to-indigo-300 bg-clip-text text-transparent">
-                สร้างบิลใหม่
-              </h1>
-              <p className="text-slate-500 mt-1 text-xs sm:text-sm">
-                ระบุรายละเอียดบิลพร้อมเพย์ผู้รับ และใส่รายการเพื่อนที่ต้องการหารเงิน
-              </p>
+              <h1 className="text-base font-black text-foreground">สร้างบิลใหม่</h1>
+              <p className="text-[11px] text-muted-foreground leading-none">ใส่ข้อมูลบิลและรายชื่อเพื่อน</p>
             </div>
           </div>
+          <ThemeToggle />
         </div>
+      </header>
 
-        {/* การ์ดฟอร์มข้อมูลบิลหลัก */}
-        <Card className="bg-slate-900/30 border-slate-800/80 backdrop-blur-md shadow-2xl rounded-2xl overflow-hidden relative">
-          <div className="absolute top-0 left-0 w-full h-[3px] bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500" />
-          
-          <CardHeader className="border-b border-slate-800/50 pb-6 pt-7 px-6 sm:px-8">
-            <CardTitle className="text-lg font-bold text-slate-200 flex items-center gap-2">
-              <Wallet className="h-4 w-4 text-indigo-400" /> กรอกข้อมูลบิลหลัก
-            </CardTitle>
-            <CardDescription className="text-slate-500 text-xs mt-1">
-              ข้อมูลเบอร์พร้อมเพย์จะถูกนำไปใช้เจนรูป QR Code เพื่อให้เพื่อนโอนจ่ายเงินได้ทันที
-            </CardDescription>
-          </CardHeader>
-          
-          <CardContent className="pt-6 px-6 sm:px-8">
-            <form onSubmit={handleSubmit} className="space-y-6">
-              
-              {/* 1. ฟิลด์กรอกชื่อบิล */}
-              <div className="space-y-2">
-                <Label htmlFor="title" className="text-xs font-bold uppercase tracking-wider text-slate-400">
+      {/* ================================================================
+          FORM CONTENT
+          ================================================================ */}
+      <form onSubmit={handleSubmit} className="flex-1 flex flex-col">
+        <div className="flex-1 max-w-lg mx-auto w-full px-4 pt-5 pb-4 relative z-10 space-y-4">
+
+          {/* --- Section: ข้อมูลบิลหลัก --- */}
+          <div className="bg-card border border-border rounded-2xl overflow-hidden">
+            {/* แถบสี gradient ด้านบน card */}
+            <div className="h-1 w-full bg-gradient-to-r from-indigo-500 via-purple-500 to-violet-500" />
+
+            <div className="p-4 space-y-4">
+              <div className="flex items-center gap-2 mb-1">
+                <Wallet className="h-4 w-4 text-indigo-400" />
+                <span className="text-sm font-bold text-foreground">ข้อมูลบิลหลัก</span>
+              </div>
+
+              {/* ชื่อบิล */}
+              <div className="space-y-1.5">
+                <Label htmlFor="title" className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
                   ชื่อบิลเรียกเก็บ
                 </Label>
                 <Input
                   id="title"
                   placeholder="เช่น ค่าชาบูร้านโปรด, ค่าทริปวันหยุด"
                   value={billData.title}
-                  onChange={(e) =>
-                    setBillData((prev) => ({ ...prev, title: e.target.value }))
-                  }
+                  onChange={(e) => setBillData((prev) => ({ ...prev, title: e.target.value }))}
                   required
-                  className="h-12 bg-slate-950/80 border-slate-800/80 focus:border-indigo-500/70 text-slate-100 placeholder-slate-600 rounded-xl focus:ring-1 focus:ring-indigo-500/50 transition-all font-medium text-sm pl-4"
+                  className="
+                    h-12 bg-background border-border
+                    focus:border-indigo-500/70 focus:ring-1 focus:ring-indigo-500/50
+                    text-foreground placeholder:text-muted-foreground/60
+                    rounded-xl transition-all font-medium
+                  "
                 />
               </div>
 
-              {/* 2. ฟิลด์กรอกเบอร์พร้อมเพย์ */}
-              <div className="space-y-2">
-                <Label htmlFor="promptpay" className="text-xs font-bold uppercase tracking-wider text-slate-400">
-                  เบอร์พร้อมเพย์ผู้รับเงิน (PromptPay ID)
+              {/* เบอร์พร้อมเพย์ */}
+              <div className="space-y-1.5">
+                <Label htmlFor="promptpay" className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
+                  <Phone className="h-3 w-3" /> เบอร์พร้อมเพย์ผู้รับเงิน
                 </Label>
                 <Input
                   id="promptpay"
+                  inputMode="numeric"
                   placeholder="เช่น 0812345678 หรือเลขบัตรประชาชน"
                   value={billData.payeePromptPayId}
-                  onChange={(e) =>
-                    setBillData((prev) => ({
-                      ...prev,
-                      payeePromptPayId: e.target.value,
-                    }))
-                  }
+                  onChange={(e) => setBillData((prev) => ({ ...prev, payeePromptPayId: e.target.value }))}
                   required
-                  className="h-12 bg-slate-950/80 border-slate-800/80 focus:border-indigo-500/70 text-slate-100 placeholder-slate-600 rounded-xl focus:ring-1 focus:ring-indigo-500/50 transition-all font-mono text-sm pl-4"
+                  className="
+                    h-12 bg-background border-border
+                    focus:border-indigo-500/70 focus:ring-1 focus:ring-indigo-500/50
+                    text-foreground placeholder:text-muted-foreground/60
+                    rounded-xl transition-all font-mono
+                  "
                 />
               </div>
+            </div>
+          </div>
 
-              {/* 3. ส่วนจัดการรายการคนจ่ายเงิน (เพื่อน) */}
-              <div className="space-y-4 pt-6 border-t border-slate-800/50">
-                <div className="flex items-center justify-between">
-                  <Label className="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
-                    <UserPlus className="h-4 w-4 text-indigo-400" /> รายชื่อเพื่อนที่ร่วมหาร
-                  </Label>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={addItem}
-                    className="h-9 bg-slate-800/30 border-slate-800 hover:bg-indigo-600 text-indigo-400 hover:text-white rounded-xl transition-all duration-200 font-semibold px-3 text-xs"
-                  >
-                    <Plus className="h-3.5 w-3.5 mr-1" /> เพิ่มคนหาร
-                  </Button>
-                </div>
-
-                {/* ลูปแสดงรายชื่อคนหาร */}
-                <div className="space-y-3.5 max-h-[300px] overflow-y-auto pr-1">
-                  {billData.items.map((item, index) => (
-                    <div
-                      key={index}
-                      className="flex gap-3 items-end bg-slate-950/40 p-4 border border-slate-800/60 rounded-2xl animate-in fade-in duration-200 relative group"
-                    >
-                      {/* ช่องกรอกชื่อ */}
-                      <div className="flex-1 space-y-1.5">
-                        <Label htmlFor={`name-${index}`} className="text-[10px] font-bold text-slate-500 uppercase tracking-wider pl-0.5">
-                          ชื่อเพื่อน
-                        </Label>
-                        <Input
-                          id={`name-${index}`}
-                          placeholder="ชื่อเพื่อน"
-                          value={item.name}
-                          onChange={(e) => updateItem(index, "name", e.target.value)}
-                          required
-                          className="h-10 bg-slate-950 border-slate-800/80 focus:border-indigo-500/60 text-slate-100 placeholder-slate-700 rounded-xl text-xs font-medium pl-3"
-                        />
-                      </div>
-
-                      {/* ช่องกรอกยอดเงิน */}
-                      <div className="w-28 sm:w-36 space-y-1.5">
-                        <Label htmlFor={`amount-${index}`} className="text-[10px] font-bold text-slate-500 uppercase tracking-wider pl-0.5">
-                          ยอดเงิน (บาท)
-                        </Label>
-                        <Input
-                          id={`amount-${index}`}
-                          type="number"
-                          step="0.01"
-                          placeholder="0.00"
-                          value={item.amount}
-                          onChange={(e) =>
-                            updateItem(index, "amount", e.target.value)
-                          }
-                          required
-                          className="h-10 bg-slate-950 border-slate-800/80 focus:border-indigo-500/60 text-slate-100 placeholder-slate-700 rounded-xl font-mono text-xs pl-3"
-                        />
-                      </div>
-
-                      {/* ปุ่มลบแถว */}
-                      {billData.items.length > 1 && (
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => removeItem(index)}
-                          className="h-10 w-10 text-slate-500 hover:text-rose-400 hover:bg-rose-500/10 rounded-xl transition-all"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      )}
-                    </div>
-                  ))}
-                </div>
-
-                {/* แถบสรุปเงินรวมจำลอง */}
-                {temporaryTotal > 0 && (
-                  <div className="flex justify-between items-center p-4 bg-indigo-500/5 border border-indigo-500/10 rounded-2xl text-indigo-300 font-bold text-xs sm:text-sm shadow-inner mt-4 animate-in slide-in-from-bottom duration-200">
-                    <span className="flex items-center gap-1.5">
-                      <Coins className="h-4 w-4 text-indigo-400" /> ยอดเงินหารรวมทั้งหมด:
-                    </span>
-                    <span className="text-lg font-mono text-indigo-400">฿{temporaryTotal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-                  </div>
-                )}
+          {/* --- Section: รายชื่อเพื่อน --- */}
+          <div className="bg-card border border-border rounded-2xl overflow-hidden">
+            <div className="px-4 pt-4 pb-3 border-b border-border/50 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <UserPlus className="h-4 w-4 text-indigo-400" />
+                <span className="text-sm font-bold text-foreground">รายชื่อเพื่อน</span>
+                <span className="bg-indigo-500/10 border border-indigo-500/25 text-indigo-400 text-[10px] font-bold px-2 py-0.5 rounded-full">
+                  {billData.items.length} คน
+                </span>
               </div>
-
-              {/* ปุ่มส่งคำขอสร้างบิล */}
-              <Button
-                type="submit"
-                className="w-full h-12 text-sm sm:text-base font-bold bg-gradient-to-r from-indigo-600 via-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 border-none text-white rounded-xl shadow-lg shadow-indigo-600/15 mt-6 transition-all duration-200"
-                disabled={loading}
+              <button
+                type="button"
+                onClick={addItem}
+                className="
+                  h-9 px-3 rounded-xl text-xs font-bold
+                  bg-indigo-600 hover:bg-indigo-500
+                  text-white flex items-center gap-1.5
+                  active:scale-95 transition-all
+                "
               >
-                {loading ? "กำลังบันทึกบิลลงระบบ..." : "สร้างบิลและรับ QR Code"}
-              </Button>
-            </form>
-          </CardContent>
-        </Card>
-      </div>
+                <Plus className="h-3.5 w-3.5" /> เพิ่มคน
+              </button>
+            </div>
+
+            {/* รายการเพื่อนแต่ละคน */}
+            <div className="divide-y divide-border/50">
+              {billData.items.map((item, index) => (
+                <div
+                  key={index}
+                  className="px-4 py-3.5 flex items-end gap-3 animate-in fade-in duration-150"
+                >
+                  {/* ลำดับ */}
+                  <div className="w-7 h-7 rounded-lg bg-secondary border border-border flex items-center justify-center flex-shrink-0 mb-1">
+                    <span className="text-[11px] font-bold text-muted-foreground">{index + 1}</span>
+                  </div>
+
+                  {/* ชื่อเพื่อน */}
+                  <div className="flex-1 space-y-1">
+                    <Label htmlFor={`name-${index}`} className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider">
+                      ชื่อ
+                    </Label>
+                    <Input
+                      id={`name-${index}`}
+                      placeholder="ชื่อเพื่อน"
+                      value={item.name}
+                      onChange={(e) => updateItem(index, "name", e.target.value)}
+                      required
+                      className="
+                        h-11 bg-background border-border
+                        focus:border-indigo-500/60 focus:ring-1 focus:ring-indigo-500/50
+                        text-foreground placeholder:text-muted-foreground/60
+                        rounded-xl text-sm
+                      "
+                    />
+                  </div>
+
+                  {/* ยอดเงิน */}
+                  <div className="w-28 space-y-1">
+                    <Label htmlFor={`amount-${index}`} className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider">
+                      ยอด (฿)
+                    </Label>
+                    <Input
+                      id={`amount-${index}`}
+                      type="number"
+                      inputMode="decimal"
+                      step="0.01"
+                      placeholder="0.00"
+                      value={item.amount}
+                      onChange={(e) => updateItem(index, "amount", e.target.value)}
+                      required
+                      className="
+                        h-11 bg-background border-border
+                        focus:border-indigo-500/60 focus:ring-1 focus:ring-indigo-500/50
+                        text-foreground placeholder:text-muted-foreground/60
+                        rounded-xl font-mono text-sm
+                      "
+                    />
+                  </div>
+
+                  {/* ปุ่มลบ */}
+                  {billData.items.length > 1 && (
+                    <button
+                      type="button"
+                      onClick={() => removeItem(index)}
+                      aria-label="ลบรายการนี้"
+                      className="
+                        w-10 h-11 rounded-xl flex items-center justify-center flex-shrink-0
+                        text-muted-foreground hover:text-red-400
+                        hover:bg-red-500/10 active:scale-95
+                        transition-all
+                      "
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </button>
+                  )}
+                </div>
+              ))}
+            </div>
+
+            {/* สรุปยอดรวมชั่วคราว */}
+            {temporaryTotal > 0 && (
+              <div className="mx-4 mb-4 mt-1 flex justify-between items-center p-3.5 bg-indigo-500/8 dark:bg-indigo-500/10 border border-indigo-500/20 rounded-xl">
+                <span className="text-xs font-bold text-indigo-400 flex items-center gap-1.5">
+                  <Coins className="h-3.5 w-3.5" /> ยอดรวมทั้งหมด
+                </span>
+                <span className="text-base font-mono font-black text-indigo-400">
+                  ฿{temporaryTotal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                </span>
+              </div>
+            )}
+          </div>
+
+          {/* padding เว้นพื้นที่ให้ sticky button */}
+          <div className="h-2" />
+        </div>
+
+        {/* ================================================================
+            STICKY SUBMIT BAR — ติดด้านล่างเสมอ
+            ================================================================ */}
+        <div className="sticky bottom-0 z-50 bg-background/90 backdrop-blur-md border-t border-border/60 pb-safe">
+          <div className="max-w-lg mx-auto px-4 pt-3 pb-3">
+            <Button
+              type="submit"
+              disabled={loading}
+              className="
+                w-full h-13 text-sm font-bold
+                bg-gradient-to-r from-indigo-600 via-indigo-600 to-violet-600
+                hover:from-indigo-500 hover:to-violet-500
+                border-none text-white rounded-2xl
+                shadow-lg shadow-indigo-600/20
+                active:scale-[0.98] transition-all duration-200
+                disabled:opacity-60
+              "
+            >
+              {loading ? "กำลังบันทึก..." : "✨ สร้างบิลและรับ QR Code"}
+            </Button>
+          </div>
+        </div>
+      </form>
     </div>
   )
 }

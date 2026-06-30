@@ -3,32 +3,34 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* ============================================================
+   ธีมหลัก Dark Mode — Indigo/Violet เป็น Accent
+   ============================================================ */
 :root {
-  /* ธีมหลัก Dark Mode — Indigo/Violet เป็น Accent */
-  --background: oklch(0.09 0 0);       /* slate-950 */
-  --foreground: oklch(0.93 0 0);       /* slate-100 */
-  --card: oklch(0.13 0 0);             /* slate-900 */
+  --background: oklch(0.09 0 0);
+  --foreground: oklch(0.93 0 0);
+  --card: oklch(0.13 0 0);
   --card-foreground: oklch(0.93 0 0);
   --popover: oklch(0.13 0 0);
   --popover-foreground: oklch(0.93 0 0);
-  --primary: oklch(0.585 0.233 264);   /* indigo-500 */
+  --primary: oklch(0.585 0.233 264);
   --primary-foreground: oklch(0.98 0 0);
-  --secondary: oklch(0.21 0 0);        /* slate-800 */
+  --secondary: oklch(0.21 0 0);
   --secondary-foreground: oklch(0.85 0 0);
   --muted: oklch(0.21 0 0);
   --muted-foreground: oklch(0.60 0 0);
   --accent: oklch(0.21 0 0);
   --accent-foreground: oklch(0.93 0 0);
-  --destructive: oklch(0.45 0.18 25);  /* rose-600 */
+  --destructive: oklch(0.45 0.18 25);
   --destructive-foreground: oklch(0.97 0 0);
-  --border: oklch(0.21 0 0);           /* slate-800 */
-  --input: oklch(0.16 0 0);            /* slate-900 ใกล้เคียง slate-950 */
-  --ring: oklch(0.585 0.233 264);      /* indigo-500 เป็น focus ring */
-  --chart-1: oklch(0.585 0.233 264);   /* indigo */
-  --chart-2: oklch(0.65 0.22 300);     /* violet */
-  --chart-3: oklch(0.55 0.18 162);     /* emerald */
-  --chart-4: oklch(0.68 0.20 55);      /* amber */
-  --chart-5: oklch(0.55 0.22 25);      /* rose */
+  --border: oklch(0.21 0 0);
+  --input: oklch(0.16 0 0);
+  --ring: oklch(0.585 0.233 264);
+  --chart-1: oklch(0.585 0.233 264);
+  --chart-2: oklch(0.65 0.22 300);
+  --chart-3: oklch(0.55 0.18 162);
+  --chart-4: oklch(0.68 0.20 55);
+  --chart-5: oklch(0.55 0.22 25);
   --radius: 0.75rem;
   --sidebar: oklch(0.13 0 0);
   --sidebar-foreground: oklch(0.93 0 0);
@@ -40,7 +42,45 @@
   --sidebar-ring: oklch(0.585 0.233 264);
 }
 
-/* Dark class — ใช้ค่าเดียวกับ :root เนื่องจาก app บังคับ dark mode เสมอ */
+/* ============================================================
+   ธีม Light Mode — ใช้เมื่อ class="light" อยู่บน html
+   ============================================================ */
+.light {
+  --background: oklch(0.98 0 0);
+  --foreground: oklch(0.15 0 0);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.15 0 0);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.15 0 0);
+  --primary: oklch(0.53 0.233 264);
+  --primary-foreground: oklch(0.98 0 0);
+  --secondary: oklch(0.94 0 0);
+  --secondary-foreground: oklch(0.25 0 0);
+  --muted: oklch(0.94 0 0);
+  --muted-foreground: oklch(0.50 0 0);
+  --accent: oklch(0.94 0 0);
+  --accent-foreground: oklch(0.15 0 0);
+  --destructive: oklch(0.52 0.20 25);
+  --destructive-foreground: oklch(0.98 0 0);
+  --border: oklch(0.88 0 0);
+  --input: oklch(0.92 0 0);
+  --ring: oklch(0.53 0.233 264);
+  --chart-1: oklch(0.53 0.233 264);
+  --chart-2: oklch(0.55 0.22 300);
+  --chart-3: oklch(0.50 0.18 162);
+  --chart-4: oklch(0.62 0.20 55);
+  --chart-5: oklch(0.52 0.22 25);
+  --sidebar: oklch(0.97 0 0);
+  --sidebar-foreground: oklch(0.15 0 0);
+  --sidebar-primary: oklch(0.53 0.233 264);
+  --sidebar-primary-foreground: oklch(0.98 0 0);
+  --sidebar-accent: oklch(0.94 0 0);
+  --sidebar-accent-foreground: oklch(0.15 0 0);
+  --sidebar-border: oklch(0.88 0 0);
+  --sidebar-ring: oklch(0.53 0.233 264);
+}
+
+/* Dark class — ใช้ค่าเดียวกับ :root */
 .dark {
   --background: oklch(0.09 0 0);
   --foreground: oklch(0.93 0 0);
@@ -119,8 +159,43 @@
 @layer base {
   * {
     @apply border-border outline-ring/50;
+    /* เพิ่ม touch-action เพื่อให้ responsive บน mobile ดีขึ้น */
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
   }
+
   body {
     @apply bg-background text-foreground font-sans;
+    /* รองรับ safe area สำหรับมือถือ notch/rounded corner */
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
   }
+
+  /* ปรับ scroll ให้ smooth บนทุก platform */
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  /* ป้องกัน input zoom บน iOS (ต้องใช้ font-size >= 16px) */
+  input, textarea, select {
+    font-size: 16px !important;
+  }
+
+  /* ปรับปุ่มให้กดง่ายบน mobile (minimum touch target 44px) */
+  button, [role="button"] {
+    min-height: 44px;
+    cursor: pointer;
+  }
+}
+
+/* ============================================================
+   Utility — Bottom safe area padding สำหรับ iOS home indicator
+   ============================================================ */
+.pb-safe {
+  padding-bottom: max(1rem, env(safe-area-inset-bottom));
+}
+
+.pb-safe-lg {
+  padding-bottom: max(1.5rem, env(safe-area-inset-bottom));
 }

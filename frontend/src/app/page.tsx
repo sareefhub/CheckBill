@@ -3,11 +3,16 @@
 import { useState, useEffect } from "react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Receipt, Plus, Search, Sparkles, Share2, FileCheck, ArrowRight, Clock } from "lucide-react"
+import {
+  Receipt, Plus, Search, Share2, FileCheck,
+  ArrowRight, Clock, ChevronRight, Trash2
+} from "lucide-react"
+import { ThemeToggle } from "@/components/theme-toggle"
 
-// กำหนดประเภทประวัติบิลล่าสุด
+// ============================================================
+// ประเภทข้อมูลประวัติบิลล่าสุด
+// ============================================================
 interface RecentBill {
   slug: string
   title: string
@@ -19,7 +24,7 @@ export default function HomePage() {
   const [slug, setSlug] = useState("")
   const [recentBills, setRecentBills] = useState<RecentBill[]>([])
 
-  // โหลดประวัติบิลล่าสุดจาก localStorage หลังเปิดหน้าเว็บ
+  // โหลดประวัติบิลจาก localStorage หลังเปิดหน้าเว็บ
   useEffect(() => {
     if (typeof window !== "undefined") {
       const stored = localStorage.getItem("recent_bills")
@@ -33,213 +38,235 @@ export default function HomePage() {
     }
   }, [])
 
+  // นำทางไปหน้าบิลตาม slug ที่พิมพ์
   const handleSearch = () => {
     if (slug.trim()) {
       window.location.href = `/bills/${slug.trim()}`
     }
   }
 
-  return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col justify-between relative overflow-hidden">
-      {/* เอฟเฟกต์แสงสะท้อนหลังสากล (Background Glows) */}
-      <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] rounded-full bg-indigo-500/10 blur-[120px] pointer-events-none" />
-      <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] rounded-full bg-violet-500/10 blur-[120px] pointer-events-none" />
+  // ล้างประวัติบิลทั้งหมด
+  const handleClearHistory = () => {
+    localStorage.removeItem("recent_bills")
+    setRecentBills([])
+  }
 
-      {/* เนื้อหาหลัก */}
-      <div className="container mx-auto px-4 py-16 max-w-5xl relative z-10 my-auto">
-        
-        {/* ส่วนหัวเว็บบอร์ด (Hero Section) */}
-        <div className="text-center mb-16 space-y-6">
-          <div className="inline-flex items-center gap-2 bg-indigo-500/10 border border-indigo-500/30 px-4 py-1.5 rounded-full text-indigo-300 text-sm font-medium mb-4 animate-pulse">
-            <Sparkles className="h-4 w-4" />
-            <span>ปรับปรุงระบบ API & UI แบบ Monolith เรียบร้อยแล้ว</span>
-          </div>
-          <div className="flex items-center justify-center gap-4">
-            <div className="bg-indigo-600/20 p-4 rounded-3xl border border-indigo-500/30 shadow-lg shadow-indigo-500/5">
-              <Receipt className="h-14 w-14 text-indigo-400" />
+  return (
+    <div className="min-h-screen bg-background text-foreground flex flex-col relative overflow-hidden">
+
+      {/* === แสงตกแต่งพื้นหลัง === */}
+      <div className="absolute top-[-10%] left-[-10%] w-[60%] h-[60%] rounded-full bg-indigo-500/8 blur-[120px] pointer-events-none dark:bg-indigo-500/10" />
+      <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] rounded-full bg-violet-500/8 blur-[120px] pointer-events-none dark:bg-violet-500/10" />
+
+      {/* ================================================================
+          HEADER — โลโก้ + Theme Toggle
+          ================================================================ */}
+      <header className="sticky top-0 z-50 w-full border-b border-border/60 bg-background/80 backdrop-blur-md">
+        <div className="max-w-lg mx-auto px-4 h-14 flex items-center justify-between">
+          {/* โลโก้ */}
+          <div className="flex items-center gap-2">
+            <div className="bg-indigo-500/15 p-1.5 rounded-lg border border-indigo-500/25">
+              <Receipt className="h-5 w-5 text-indigo-400" />
             </div>
-            <h1 className="text-5xl md:text-6xl font-black tracking-tight bg-gradient-to-r from-white via-slate-100 to-indigo-300 bg-clip-text text-transparent">
+            <span className="text-lg font-black tracking-tight bg-gradient-to-r from-foreground to-indigo-400 bg-clip-text text-transparent">
               CheckBill
-            </h1>
+            </span>
           </div>
-          <p className="text-base md:text-lg text-slate-400 max-w-xl mx-auto leading-relaxed">
-            หารบิลกับเพื่อนอย่างชาญฉลาดและรวดเร็ว พร้อมสร้าง QR Code และระบบตรวจสอบการโอนเงินอัตโนมัติ
+          {/* ปุ่มสลับธีม */}
+          <ThemeToggle />
+        </div>
+      </header>
+
+      {/* ================================================================
+          MAIN CONTENT
+          ================================================================ */}
+      <main className="flex-1 max-w-lg mx-auto w-full px-4 pt-6 pb-safe-lg relative z-10 space-y-6">
+
+        {/* --- Hero Section (Compact Mobile) --- */}
+        <div className="text-center space-y-2 pt-2">
+          <h1 className="text-3xl font-black tracking-tight bg-gradient-to-r from-foreground via-foreground/90 to-indigo-400 bg-clip-text text-transparent">
+            หารบิลกับเพื่อน
+          </h1>
+          <p className="text-sm text-muted-foreground leading-relaxed">
+            สร้าง QR Code พร้อมเพย์ และตรวจสอบสลิปอัตโนมัติ
           </p>
         </div>
 
-        {/* ส่วนกล่องควบคุมหลัก (Main Action Cards) */}
-        <div className="grid md:grid-cols-2 gap-8 max-w-3xl mx-auto mb-12">
-          
-          {/* การ์ดสร้างบิลใหม่ */}
-          <Card className="bg-slate-900/60 border-slate-800 backdrop-blur-md hover:border-indigo-500/40 transition-all duration-300 shadow-xl hover:shadow-indigo-500/5 hover:-translate-y-1">
-            <CardHeader className="pb-4">
-              <CardTitle className="flex items-center text-xl text-slate-200">
-                <div className="bg-indigo-500/10 p-2 rounded-lg mr-3">
-                  <Plus className="h-5 w-5 text-indigo-400" />
-                </div>
-                สร้างบิลใหม่
-              </CardTitle>
-              <CardDescription className="text-slate-400 text-sm">
-                สร้างบิลค่าใช้จ่ายและเพิ่มรายชื่อเพื่อนสำหรับจ่ายเงินอย่างรวดเร็ว
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="pt-2">
-              <Link href="/create-bill">
-                <Button className="w-full h-12 text-base font-semibold bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 border-none text-white shadow-lg shadow-indigo-600/20 rounded-xl transition-all duration-200">
-                  เริ่มสร้างบิล <ArrowRight className="h-4 w-4 ml-2" />
+        {/* --- Action Cards --- */}
+        <div className="space-y-3">
+
+          {/* การ์ด: สร้างบิลใหม่ */}
+          <Link href="/create-bill" className="block">
+            <div className="
+              group flex items-center gap-4 p-4 rounded-2xl
+              bg-gradient-to-r from-indigo-600 to-violet-600
+              hover:from-indigo-500 hover:to-violet-500
+              active:scale-[0.98] transition-all duration-200
+              shadow-lg shadow-indigo-600/25
+            ">
+              <div className="bg-white/20 p-2.5 rounded-xl flex-shrink-0">
+                <Plus className="h-5 w-5 text-white" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="font-bold text-white text-base">สร้างบิลใหม่</p>
+                <p className="text-indigo-100/80 text-xs mt-0.5 truncate">
+                  ใส่ชื่อ เพื่อน และยอดเงิน แล้วแชร์ลิงก์
+                </p>
+              </div>
+              <ArrowRight className="h-5 w-5 text-white/70 group-hover:translate-x-0.5 transition-transform flex-shrink-0" />
+            </div>
+          </Link>
+
+          {/* การ์ด: ค้นหาบิลเดิมด้วยรหัส */}
+          <div className="
+            flex items-center gap-3 p-4 rounded-2xl
+            bg-card border border-border
+            shadow-sm
+          ">
+            <div className="bg-secondary p-2.5 rounded-xl flex-shrink-0">
+              <Search className="h-5 w-5 text-indigo-400" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="font-bold text-foreground text-sm mb-2">ดูบิลเดิมด้วยรหัส</p>
+              <div className="flex gap-2">
+                <input
+                  id="slug-input"
+                  type="text"
+                  inputMode="text"
+                  placeholder="ใส่รหัสบิล เช่น 3a2c5f10"
+                  value={slug}
+                  onChange={(e) => setSlug(e.target.value)}
+                  onKeyDown={(e) => { if (e.key === "Enter") handleSearch() }}
+                  className="
+                    flex-1 h-11 px-3 rounded-xl text-sm
+                    bg-background border border-border
+                    focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/50
+                    text-foreground placeholder:text-muted-foreground
+                    transition-all outline-none
+                  "
+                />
+                <Button
+                  onClick={handleSearch}
+                  disabled={!slug.trim()}
+                  className="
+                    h-11 px-4 rounded-xl
+                    bg-indigo-600 hover:bg-indigo-500 text-white
+                    disabled:opacity-40 transition-all
+                    flex-shrink-0
+                  "
+                >
+                  <Search className="h-4 w-4" />
                 </Button>
-              </Link>
-            </CardContent>
-          </Card>
-
-          {/* การ์ดค้นหาบิลเก่าด้วยรหัส */}
-          <Card className="bg-slate-900/60 border-slate-800 backdrop-blur-md hover:border-indigo-500/40 transition-all duration-300 shadow-xl hover:shadow-indigo-500/5 hover:-translate-y-1">
-            <CardHeader className="pb-4">
-              <CardTitle className="flex items-center text-xl text-slate-200">
-                <div className="bg-indigo-500/10 p-2 rounded-lg mr-3">
-                  <Search className="h-5 w-5 text-indigo-400" />
-                </div>
-                ดูบิลเดิมที่มีอยู่
-              </CardTitle>
-              <CardDescription className="text-slate-400 text-sm">
-                ระบุรหัส Slug ของบิลที่สร้างไว้แล้วเพื่อดูสถานะหรือทำการจ่ายเงิน
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="pt-2">
-              <div className="space-y-3">
-                <div className="relative">
-                  <input
-                    type="text"
-                    placeholder="เช่น 3a2c5f10"
-                    value={slug}
-                    onChange={(e) => setSlug(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter") handleSearch()
-                    }}
-                    className="w-full h-12 pl-4 pr-12 bg-slate-950/80 border border-slate-800 focus:border-indigo-500 rounded-xl text-base text-slate-100 placeholder-slate-600 focus:ring-1 focus:ring-indigo-500/50 transition-all duration-200"
-                  />
-                  <button
-                    onClick={handleSearch}
-                    className="absolute right-2 top-2 h-8 w-8 rounded-lg bg-indigo-600/10 hover:bg-indigo-600 text-indigo-400 hover:text-white flex items-center justify-center transition-colors duration-200"
-                  >
-                    <Search className="h-4 w-4" />
-                  </button>
-                </div>
-                <p className="text-xs text-slate-500 pl-1">พิมพ์รหัสแล้วกดปุ่มค้นหาหรือกด Enter เพื่อไปต่อ</p>
               </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* บิลล่าสุดที่บันทึกไว้ใน localStorage (Recent Bills) */}
-        {recentBills.length > 0 && (
-          <Card className="bg-slate-900/40 border-slate-800 max-w-3xl mx-auto mb-16 backdrop-blur-md shadow-2xl">
-            <CardHeader className="pb-3 border-b border-slate-800/40 flex flex-row items-center justify-between">
-              <div>
-                <CardTitle className="text-base text-slate-200 flex items-center gap-2">
-                  <Clock className="h-4 w-4 text-indigo-400" /> บิลล่าสุดที่คุณเข้าดู / สร้างไว้
-                </CardTitle>
-                <CardDescription className="text-xs text-slate-500">
-                  คุณสามารถคลิกลิงก์ด้านล่างเพื่อกลับเข้าไปดูหน้าบิลเดิมได้ด่วนโดยไม่ต้อง Login
-                </CardDescription>
-              </div>
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                onClick={() => {
-                  localStorage.removeItem("recent_bills")
-                  setRecentBills([])
-                }}
-                className="text-xs text-slate-500 hover:text-red-400 hover:bg-red-500/5 transition-all"
-              >
-                ล้างประวัติ
-              </Button>
-            </CardHeader>
-            <CardContent className="pt-2 px-0">
-              <div className="divide-y divide-slate-800/50 max-h-[220px] overflow-y-auto pr-1">
-                {recentBills.map((b) => (
-                  <Link 
-                    key={b.slug} 
-                    href={`/bills/${b.slug}`}
-                    className="flex justify-between items-center px-5 py-3.5 hover:bg-slate-800/25 transition-all duration-150 group"
-                  >
-                    <div className="flex flex-col">
-                      <span className="text-sm font-semibold text-slate-200 group-hover:text-indigo-400 transition-colors">
-                        {b.title}
-                      </span>
-                      <span className="text-[10px] text-slate-500 mt-0.5 font-mono">
-                        รหัส: {b.slug} • เข้าดูล่าสุด: {new Date(b.createdAt).toLocaleDateString("th-TH")} {new Date(b.createdAt).toLocaleTimeString("th-TH", { hour: '2-digit', minute: '2-digit' })}
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      {b.role === "creator" ? (
-                        <Badge className="bg-indigo-500/10 border-indigo-500/30 text-indigo-400 hover:bg-indigo-500/20 text-[10px] h-5">ผู้สร้างบิล</Badge>
-                      ) : (
-                        <Badge className="bg-slate-800 border-slate-700 text-slate-400 hover:bg-slate-800/80 text-[10px] h-5">ผู้เข้าดู</Badge>
-                      )}
-                      <ArrowRight className="h-3.5 w-3.5 text-slate-600 group-hover:text-indigo-400 group-hover:translate-x-0.5 transition-all" />
-                    </div>
-                  </Link>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        )}
-
-        {/* ส่วนคำแนะนำการใช้งาน (How It Works) */}
-        <div className="text-center space-y-12">
-          <h2 className="text-2xl md:text-3xl font-extrabold text-slate-100">
-            ขั้นตอนการใช้ระบบ
-          </h2>
-          <div className="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto">
-            
-            {/* สเต็ปที่ 1 */}
-            <div className="bg-slate-900/40 border border-slate-800/80 p-6 rounded-2xl relative">
-              <div className="bg-indigo-500/10 border border-indigo-500/30 rounded-full w-12 h-12 flex items-center justify-center mx-auto mb-4">
-                <span className="text-indigo-400 font-bold text-lg">1</span>
-              </div>
-              <h3 className="font-semibold text-slate-200 mb-2 text-lg flex items-center justify-center gap-2">
-                <Receipt className="h-4 w-4 text-indigo-400" /> ใส่ข้อมูลบิล
-              </h3>
-              <p className="text-slate-400 text-sm leading-relaxed">
-                กรอกชื่อบิล เบอร์พร้อมเพย์ของคุณ และใส่ชื่อพร้อมยอดเงินของเพื่อนแต่ละคน
-              </p>
             </div>
-
-            {/* สเต็ปที่ 2 */}
-            <div className="bg-slate-900/40 border border-slate-800/80 p-6 rounded-2xl relative">
-              <div className="bg-indigo-500/10 border border-indigo-500/30 rounded-full w-12 h-12 flex items-center justify-center mx-auto mb-4">
-                <span className="text-indigo-400 font-bold text-lg">2</span>
-              </div>
-              <h3 className="font-semibold text-slate-200 mb-2 text-lg flex items-center justify-center gap-2">
-                <Share2 className="h-4 w-4 text-indigo-400" /> แชร์ลิงก์
-              </h3>
-              <p className="text-slate-400 text-sm leading-relaxed">
-                คัดลอกลิงก์ของบิลนั้นแล้วแชร์ให้เพื่อนๆ เพื่อนทุกคนจะเห็นหน้าจอจ่ายเงินส่วนตัว
-              </p>
-            </div>
-
-            {/* สเต็ปที่ 3 */}
-            <div className="bg-slate-900/40 border border-slate-800/80 p-6 rounded-2xl relative">
-              <div className="bg-indigo-500/10 border border-indigo-500/30 rounded-full w-12 h-12 flex items-center justify-center mx-auto mb-4">
-                <span className="text-indigo-400 font-bold text-lg">3</span>
-              </div>
-              <h3 className="font-semibold text-slate-200 mb-2 text-lg flex items-center justify-center gap-2">
-                <FileCheck className="h-4 w-4 text-indigo-400" /> ตรวจสอบสลิปอัตโนมัติ
-              </h3>
-              <p className="text-slate-400 text-sm leading-relaxed">
-                เพื่อนสแกน QR และอัปโหลดรูปสลิป ระบบจะตรวจสอบยอดเงินให้อัตโนมัติและเปลี่ยนสถานะทันที
-              </p>
-            </div>
-
           </div>
         </div>
 
-      </div>
+        {/* --- ประวัติบิลล่าสุด (Recent Bills) --- */}
+        {recentBills.length > 0 && (
+          <div className="space-y-2">
+            <div className="flex items-center justify-between px-1">
+              <h2 className="text-sm font-bold text-foreground flex items-center gap-1.5">
+                <Clock className="h-3.5 w-3.5 text-indigo-400" />
+                บิลล่าสุด
+              </h2>
+              <button
+                onClick={handleClearHistory}
+                className="
+                  flex items-center gap-1 text-xs text-muted-foreground
+                  hover:text-destructive transition-colors px-2 py-1 rounded-lg
+                  hover:bg-destructive/10 active:scale-95 min-h-8
+                "
+              >
+                <Trash2 className="h-3 w-3" />
+                ล้างประวัติ
+              </button>
+            </div>
 
-      {/* ส่วนท้าย (Footer) */}
-      <footer className="w-full text-center py-6 text-slate-600 text-xs border-t border-slate-900 font-mono">
-        © 2026 CheckBill Utility. Built for modern split-bills.
+            <div className="bg-card border border-border rounded-2xl overflow-hidden shadow-sm divide-y divide-border">
+              {recentBills.map((b) => (
+                <Link
+                  key={b.slug}
+                  href={`/bills/${b.slug}`}
+                  className="
+                    flex items-center gap-3 px-4 py-3.5
+                    hover:bg-secondary/50 active:bg-secondary
+                    transition-colors group
+                  "
+                >
+                  {/* ไอคอนสถานะ creator / viewer */}
+                  <div className={`
+                    w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0
+                    ${b.role === "creator"
+                      ? "bg-indigo-500/10 border border-indigo-500/20"
+                      : "bg-secondary border border-border"}
+                  `}>
+                    <Receipt className={`h-4 w-4 ${b.role === "creator" ? "text-indigo-400" : "text-muted-foreground"}`} />
+                  </div>
+
+                  {/* ข้อมูลบิล */}
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-semibold text-foreground truncate group-hover:text-indigo-400 transition-colors">
+                      {b.title}
+                    </p>
+                    <p className="text-[11px] text-muted-foreground font-mono mt-0.5">
+                      {b.slug} · {new Date(b.createdAt).toLocaleDateString("th-TH")}
+                    </p>
+                  </div>
+
+                  <div className="flex items-center gap-2 flex-shrink-0">
+                    {b.role === "creator" ? (
+                      <Badge className="bg-indigo-500/10 border-indigo-500/25 text-indigo-400 text-[10px] h-5 px-1.5">
+                        ผู้สร้าง
+                      </Badge>
+                    ) : (
+                      <Badge className="bg-secondary border-border text-muted-foreground text-[10px] h-5 px-1.5">
+                        ผู้เข้าดู
+                      </Badge>
+                    )}
+                    <ChevronRight className="h-4 w-4 text-muted-foreground group-hover:text-indigo-400 group-hover:translate-x-0.5 transition-all" />
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* --- วิธีใช้งาน (How It Works) --- */}
+        <div className="space-y-3">
+          <h2 className="text-sm font-bold text-foreground px-1">ใช้งานยังไง?</h2>
+          <div className="space-y-2">
+            {[
+              { num: "1", icon: Receipt, title: "ใส่ข้อมูลบิล", desc: "ชื่อบิล เบอร์พร้อมเพย์ และรายชื่อเพื่อนพร้อมยอดเงิน" },
+              { num: "2", icon: Share2, title: "แชร์ลิงก์ให้เพื่อน", desc: "เพื่อนแต่ละคนจะเห็นหน้าจ่ายเงินส่วนตัวของตัวเอง" },
+              { num: "3", icon: FileCheck, title: "ตรวจสลิปอัตโนมัติ", desc: "เพื่อนสแกน QR และอัปโหลดสลิป ระบบจะตรวจสอบให้ทันที" },
+            ].map((step) => (
+              <div
+                key={step.num}
+                className="flex items-start gap-4 p-4 bg-card border border-border rounded-2xl"
+              >
+                <div className="bg-indigo-500/10 border border-indigo-500/25 rounded-xl w-10 h-10 flex items-center justify-center flex-shrink-0">
+                  <span className="text-indigo-400 font-black text-base">{step.num}</span>
+                </div>
+                <div className="flex-1 min-w-0 pt-0.5">
+                  <p className="font-bold text-foreground text-sm flex items-center gap-1.5">
+                    <step.icon className="h-3.5 w-3.5 text-indigo-400" />
+                    {step.title}
+                  </p>
+                  <p className="text-muted-foreground text-xs mt-1 leading-relaxed">{step.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+      </main>
+
+      {/* ================================================================
+          FOOTER
+          ================================================================ */}
+      <footer className="w-full text-center py-4 text-muted-foreground/60 text-xs border-t border-border/50 font-mono">
+        © 2026 CheckBill Utility
       </footer>
     </div>
   )
