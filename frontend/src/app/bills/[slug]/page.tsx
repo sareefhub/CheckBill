@@ -76,7 +76,36 @@ export default function ViewBillPage() {
   // โหลดข้อมูลบิลใหม่จาก Backend
   const fetchBill = async () => {
     try {
-      setBill(await billApi.getBill(slug))
+      const data = await billApi.getBill(slug)
+      setBill(data)
+
+      // บันทึกบิลนี้ลงในประวัติผู้เข้าดู (localStorage) เพื่อช่วยจดจำบิลด่วน
+      if (typeof window !== "undefined" && data) {
+        try {
+          const recentBills = JSON.parse(localStorage.getItem("recent_bills") || "[]")
+          const existingIndex = recentBills.findIndex((b: any) => b.slug === data.publicSlug)
+
+          // OPTIMIZATION: ถ้าบิลนี้อยู่บนสุดของรายการประวัติอยู่แล้ว ไม่ต้องเขียนทับ เพื่อป้องกันเว็บบล็อกหรือกระตุก
+          if (existingIndex === 0) {
+            return;
+          }
+
+          const billRecord = {
+            slug: data.publicSlug,
+            title: data.title,
+            createdAt: new Date().toISOString(),
+            role: existingIndex >= 0 ? recentBills[existingIndex].role : "viewer"
+          }
+
+          if (existingIndex >= 0) {
+            recentBills.splice(existingIndex, 1) // เอาประวัติเก่าออกเพื่อย้ายมาลำดับแรกสุด
+          }
+          recentBills.unshift(billRecord)
+          localStorage.setItem("recent_bills", JSON.stringify(recentBills.slice(0, 10)))
+        } catch (e) {
+          console.error("Failed to save recent bill viewer history", e)
+        }
+      }
     } catch {
       toast({
         title: "เกิดข้อผิดพลาด",

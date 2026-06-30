@@ -118,6 +118,24 @@ export default function CreateBillPage() {
         description: "สร้างบิลเรียบร้อยแล้ว กำลังนำคุณไปที่หน้าบิล...",
       })
 
+      // บันทึกบิลนี้ลงในประวัติผู้สร้าง (localStorage) เพื่อให้จดจำได้โดยไม่ต้องมี Login
+      if (typeof window !== "undefined") {
+        try {
+          const recentBills = JSON.parse(localStorage.getItem("recent_bills") || "[]")
+          if (!recentBills.some((b: any) => b.slug === response.publicSlug)) {
+            recentBills.unshift({
+              slug: response.publicSlug,
+              title: billData.title.trim(),
+              createdAt: new Date().toISOString(),
+              role: "creator"
+            })
+            localStorage.setItem("recent_bills", JSON.stringify(recentBills.slice(0, 10)))
+          }
+        } catch (e) {
+          console.error("Failed to save recent bill", e)
+        }
+      }
+
       // ไปยังหน้ารายละเอียดบิลที่เพิ่งสร้าง
       router.push(`/bills/${response.publicSlug}`)
     } catch (err: unknown) {

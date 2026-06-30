@@ -1,13 +1,37 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Receipt, Plus, Search, Sparkles, Share2, FileCheck, ArrowRight } from "lucide-react"
+import { Badge } from "@/components/ui/badge"
+import { Receipt, Plus, Search, Sparkles, Share2, FileCheck, ArrowRight, Clock } from "lucide-react"
+
+// กำหนดประเภทประวัติบิลล่าสุด
+interface RecentBill {
+  slug: string
+  title: string
+  createdAt: string
+  role: "creator" | "viewer"
+}
 
 export default function HomePage() {
   const [slug, setSlug] = useState("")
+  const [recentBills, setRecentBills] = useState<RecentBill[]>([])
+
+  // โหลดประวัติบิลล่าสุดจาก localStorage หลังเปิดหน้าเว็บ
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const stored = localStorage.getItem("recent_bills")
+      if (stored) {
+        try {
+          setRecentBills(JSON.parse(stored))
+        } catch (e) {
+          console.error("Failed to parse recent bills", e)
+        }
+      }
+    }
+  }, [])
 
   const handleSearch = () => {
     if (slug.trim()) {
@@ -44,7 +68,7 @@ export default function HomePage() {
         </div>
 
         {/* ส่วนกล่องควบคุมหลัก (Main Action Cards) */}
-        <div className="grid md:grid-cols-2 gap-8 max-w-3xl mx-auto mb-20">
+        <div className="grid md:grid-cols-2 gap-8 max-w-3xl mx-auto mb-12">
           
           {/* การ์ดสร้างบิลใหม่ */}
           <Card className="bg-slate-900/60 border-slate-800 backdrop-blur-md hover:border-indigo-500/40 transition-all duration-300 shadow-xl hover:shadow-indigo-500/5 hover:-translate-y-1">
@@ -107,6 +131,61 @@ export default function HomePage() {
           </Card>
         </div>
 
+        {/* บิลล่าสุดที่บันทึกไว้ใน localStorage (Recent Bills) */}
+        {recentBills.length > 0 && (
+          <Card className="bg-slate-900/40 border-slate-800 max-w-3xl mx-auto mb-16 backdrop-blur-md shadow-2xl">
+            <CardHeader className="pb-3 border-b border-slate-800/40 flex flex-row items-center justify-between">
+              <div>
+                <CardTitle className="text-base text-slate-200 flex items-center gap-2">
+                  <Clock className="h-4 w-4 text-indigo-400" /> บิลล่าสุดที่คุณเข้าดู / สร้างไว้
+                </CardTitle>
+                <CardDescription className="text-xs text-slate-500">
+                  คุณสามารถคลิกลิงก์ด้านล่างเพื่อกลับเข้าไปดูหน้าบิลเดิมได้ด่วนโดยไม่ต้อง Login
+                </CardDescription>
+              </div>
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={() => {
+                  localStorage.removeItem("recent_bills")
+                  setRecentBills([])
+                }}
+                className="text-xs text-slate-500 hover:text-red-400 hover:bg-red-500/5 transition-all"
+              >
+                ล้างประวัติ
+              </Button>
+            </CardHeader>
+            <CardContent className="pt-2 px-0">
+              <div className="divide-y divide-slate-800/50 max-h-[220px] overflow-y-auto pr-1">
+                {recentBills.map((b) => (
+                  <Link 
+                    key={b.slug} 
+                    href={`/bills/${b.slug}`}
+                    className="flex justify-between items-center px-5 py-3.5 hover:bg-slate-800/25 transition-all duration-150 group"
+                  >
+                    <div className="flex flex-col">
+                      <span className="text-sm font-semibold text-slate-200 group-hover:text-indigo-400 transition-colors">
+                        {b.title}
+                      </span>
+                      <span className="text-[10px] text-slate-500 mt-0.5 font-mono">
+                        รหัส: {b.slug} • เข้าดูล่าสุด: {new Date(b.createdAt).toLocaleDateString("th-TH")} {new Date(b.createdAt).toLocaleTimeString("th-TH", { hour: '2-digit', minute: '2-digit' })}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      {b.role === "creator" ? (
+                        <Badge className="bg-indigo-500/10 border-indigo-500/30 text-indigo-400 hover:bg-indigo-500/20 text-[10px] h-5">ผู้สร้างบิล</Badge>
+                      ) : (
+                        <Badge className="bg-slate-800 border-slate-700 text-slate-400 hover:bg-slate-800/80 text-[10px] h-5">ผู้เข้าดู</Badge>
+                      )}
+                      <ArrowRight className="h-3.5 w-3.5 text-slate-600 group-hover:text-indigo-400 group-hover:translate-x-0.5 transition-all" />
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
         {/* ส่วนคำแนะนำการใช้งาน (How It Works) */}
         <div className="text-center space-y-12">
           <h2 className="text-2xl md:text-3xl font-extrabold text-slate-100">
@@ -159,7 +238,7 @@ export default function HomePage() {
       </div>
 
       {/* ส่วนท้าย (Footer) */}
-      <footer className="w-full text-center py-6 text-slate-600 text-xs border-t border-slate-900">
+      <footer className="w-full text-center py-6 text-slate-600 text-xs border-t border-slate-900 font-mono">
         © 2026 CheckBill Utility. Built for modern split-bills.
       </footer>
     </div>
