@@ -1,6 +1,6 @@
 "use client"
 
-import { createContext, useContext, useEffect, useState } from "react"
+import { createContext, useContext, useEffect, useState, useMemo, useCallback } from "react"
 
 // ============================================================
 // Context สำหรับ Theme (dark / light)
@@ -13,7 +13,7 @@ interface ThemeContextType {
 }
 
 const ThemeContext = createContext<ThemeContextType>({
-  theme: "dark",
+  theme: "light",
   toggleTheme: () => {},
 })
 
@@ -24,12 +24,12 @@ export function useTheme() {
 // ============================================================
 // ThemeProvider — ห่อทั้ง app เพื่อควบคุม theme
 // ============================================================
-export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  // โหลด theme จาก localStorage ถ้ามี ไม่งั้นใช้ dark เป็น default
-  const [theme, setTheme] = useState<Theme>("dark")
+export function ThemeProvider({ children }: Readonly<{ children: React.ReactNode }>) {
+  // โหลด theme จาก localStorage ถ้ามี ไม่งั้นใช้ light เป็น default
+  const [theme, setTheme] = useState<Theme>("light")
 
   useEffect(() => {
-    if (typeof window !== "undefined") {
+    if (globalThis.window !== undefined) {
       const saved = localStorage.getItem("checkbill-theme") as Theme | null
       if (saved === "light" || saved === "dark") {
         setTheme(saved)
@@ -45,12 +45,16 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     localStorage.setItem("checkbill-theme", theme)
   }, [theme])
 
-  const toggleTheme = () => {
+  // ใช้ useCallback เพื่อป้องกันไม่ให้สร้างฟังก์ชันใหม่ในทุกการเรนเดอร์
+  const toggleTheme = useCallback(() => {
     setTheme((prev) => (prev === "dark" ? "light" : "dark"))
-  }
+  }, [])
+
+  // ใช้ useMemo เพื่อจำค่า value และป้องกันไม่ให้ Context Provider ส่งค่าใหม่ทุกครั้งที่เรนเดอร์
+  const value = useMemo(() => ({ theme, toggleTheme }), [theme, toggleTheme])
 
   return (
-    <ThemeContext.Provider value={{ theme, toggleTheme }}>
+    <ThemeContext.Provider value={value}>
       {children}
     </ThemeContext.Provider>
   )
