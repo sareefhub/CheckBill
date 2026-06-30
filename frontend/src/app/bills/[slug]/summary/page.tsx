@@ -86,8 +86,8 @@ export default function BillSummaryPage() {
   const totalItems = bill.items.length
   const paid = bill.items.filter((i) => i.status === "PAID")
   const unpaid = bill.items.filter((i) => i.status !== "PAID")
-  const paidAmount = paid.reduce((sum, i) => sum + i.amount, 0)
-  const unpaidAmount = unpaid.reduce((sum, i) => sum + i.amount, 0)
+  const paidAmount = paid.reduce((sum, i) => sum + Number(i.amount), 0)
+  const unpaidAmount = unpaid.reduce((sum, i) => sum + Number(i.amount), 0)
   const totalAmount = paidAmount + unpaidAmount
   const completionRate = totalItems > 0 ? Math.round((paid.length / totalItems) * 100) : 0
 

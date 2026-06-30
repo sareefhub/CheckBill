@@ -290,8 +290,8 @@ export default function ViewBillPage() {
   }
 
   // คำนวณสรุปยอดเงิน
-  const total = bill?.items.reduce((s, i) => s + i.amount, 0) ?? 0
-  const paid = bill?.items.filter(i => i.status === "PAID").reduce((s, i) => s + i.amount, 0) ?? 0
+  const total = bill?.items.reduce((s, i) => s + Number(i.amount), 0) ?? 0
+  const paid = bill?.items.filter(i => i.status === "PAID").reduce((s, i) => s + Number(i.amount), 0) ?? 0
   const progressPercent = total > 0 ? Math.round((paid / total) * 100) : 0
 
   if (loading) {
@@ -512,8 +512,43 @@ export default function ViewBillPage() {
               <p className="text-slate-400 animate-pulse text-sm py-8">กำลังสร้างภาพ QR Code...</p>
             ) : (
               qrDialog.qrImage && (
-                <div className="bg-white p-4 rounded-2xl shadow-xl border border-slate-200">
-                  <img src={qrDialog.qrImage} alt="PromptPay QR Code" className="h-56 w-56 mx-auto" />
+                <div className="w-full max-w-[280px] bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-2xl flex flex-col items-center pb-5 text-slate-850 animate-in zoom-in duration-200">
+                  {/* 1. แถบสีน้ำเงินเข้มด้านบนสุดเขียน THAI QR PAYMENT */}
+                  <div className="w-full bg-[#073863] py-3 px-5 flex items-center justify-center gap-2.5">
+                    <svg viewBox="0 0 100 100" className="w-7 h-7" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      {/* ขอบนอกเครื่องหมายบวกเว้าเหลี่ยมสีขาว */}
+                      <path d="M30 20H70C75.5228 20 80 24.4772 80 30V70C80 75.5228 75.5228 80 70 80H30C24.4772 80 20 75.5228 20 70V30C20 24.4772 24.4772 20 30 20Z" stroke="white" strokeWidth="8" strokeLinejoin="round"/>
+                      <path d="M50 35V65M35 50H65" stroke="white" strokeWidth="9" strokeLinecap="round"/>
+                      {/* หัวลูกศรเฉียงขึ้นด้านขวา สีเขียวพาสเทล */}
+                      <path d="M70 70L58 58M70 70V60M70 70H60" stroke="#4bc0a5" strokeWidth="9" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                    <div className="flex flex-col text-left leading-none text-white">
+                      <span className="font-sans font-extrabold text-[11px] tracking-wider">THAI QR</span>
+                      <span className="font-sans font-medium text-[8px] tracking-[0.18em] opacity-90 mt-0.5">PAYMENT</span>
+                    </div>
+                  </div>
+
+                  {/* 2. แถบโลโก้ พร้อมเพย์ / PromptPay สีน้ำเงินใต้แถบน้ำเงิน */}
+                  <div className="border-[1.5px] border-[#073863] px-4.5 py-1 rounded-sm flex flex-col items-center justify-center mt-3.5 scale-90">
+                    <span className="text-[6.5px] text-[#073863] font-bold tracking-[0.2em] leading-none mb-0.5">พร้อมเพย์</span>
+                    <div className="flex items-baseline font-sans font-black text-xs tracking-tight text-[#073863] leading-none">
+                      Prompt<span className="text-[#a5c510]">Pay</span>
+                    </div>
+                  </div>
+
+                  {/* 3. รูปภาพ QR Code พร้อมวางไอคอน Thai QR ซ้อนทับตรงกลาง (Watermark Overlay) */}
+                  <div className="relative bg-white p-1 rounded-xl mt-2">
+                    <img src={qrDialog.qrImage} alt="PromptPay QR Code" className="h-44 w-44 mx-auto block" />
+                    
+                    {/* ไอคอน Thai QR ตรงกลางรูปภาพ */}
+                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white p-0.5 rounded shadow-sm border border-slate-100 flex items-center justify-center">
+                      <svg viewBox="0 0 100 100" className="w-5 h-5" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M30 20H70C75.5228 20 80 24.4772 80 30V70C80 75.5228 75.5228 80 70 80H30C24.4772 80 20 75.5228 20 70V30C20 24.4772 24.4772 20 30 20Z" stroke="#073863" strokeWidth="8" strokeLinejoin="round"/>
+                        <path d="M50 35V65M35 50H65" stroke="#073863" strokeWidth="9" strokeLinecap="round"/>
+                        <path d="M70 70L58 58M70 70V60M70 70H60" stroke="#4bc0a5" strokeWidth="9" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                    </div>
+                  </div>
                 </div>
               )
             )}
