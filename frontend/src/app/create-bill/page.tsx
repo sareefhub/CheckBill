@@ -253,13 +253,14 @@ export default function CreateBillPage() {
 
           {/* --- การ์ดรอง: รายชื่อเพื่อนร่วมหาร --- */}
           <div className="bg-card border border-border rounded-2xl shadow-sm overflow-hidden">
-            <div className="px-4 pt-4 pb-3 border-b border-border/50 flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <div className="bg-indigo-500/10 p-1.5 rounded-lg border border-indigo-500/15">
+            {/* ส่วนหัวการ์ดที่รองรับ Responsive บนมือถือ */}
+            <div className="px-4 pt-4 pb-3 border-b border-border/50 flex flex-wrap items-center justify-between gap-3">
+              <div className="flex items-center gap-2 min-w-0">
+                <div className="bg-indigo-500/10 p-1.5 rounded-lg border border-indigo-500/15 flex-shrink-0">
                   <UserPlus className="h-4 w-4 text-indigo-400" />
                 </div>
-                <span className="text-sm font-bold text-foreground">รายชื่อเพื่อนร่วมหาร</span>
-                <span className="bg-indigo-500/10 border border-indigo-500/25 text-indigo-400 text-xs font-bold px-2.5 py-0.5 rounded-full">
+                <span className="text-sm font-bold text-foreground truncate">รายชื่อเพื่อนร่วมหาร</span>
+                <span className="bg-indigo-500/10 border border-indigo-500/25 text-indigo-400 text-xs font-bold px-2 py-0.5 rounded-full flex-shrink-0">
                   {billData.items.length} คน
                 </span>
               </div>
@@ -267,22 +268,22 @@ export default function CreateBillPage() {
                 type="button"
                 onClick={addItem}
                 className="
-                  h-9 px-3.5 rounded-xl text-sm font-semibold
+                  w-full min-[400px]:w-auto h-9 px-3.5 rounded-xl text-sm font-semibold
                   bg-indigo-600 hover:bg-indigo-500
-                  text-white flex items-center gap-1
+                  text-white flex items-center justify-center gap-1
                   active:scale-95 transition-all shadow-sm shadow-indigo-600/10
                 "
               >
-                <Plus className="h-3.5 w-3.5" />
-                <span>เพิ่มเพื่อนร่วมหาร</span>
+                <Plus className="h-3.5 w-3.5 flex-shrink-0" />
+                <span className="whitespace-nowrap">เพิ่มเพื่อนร่วมหาร</span>
               </button>
             </div>
 
-            {/* แถวแนะนำหัวคอลัมน์ */}
+            {/* แถวแนะนำหัวคอลัมน์ ปรับขนาดคอลัมน์ยอดเงินให้ยืดหยุ่น */}
             <div className="px-4 pt-2.5 pb-1 flex items-center gap-2 text-xs font-bold text-muted-foreground/80 bg-secondary/20 border-b border-border/30">
               <div className="w-6 flex-shrink-0 text-center">#</div>
               <div className="flex-1 pl-1">ชื่อเพื่อนร่วมหาร</div>
-              <div className="w-24 pl-1">ยอดเงิน (บาท)</div>
+              <div className="w-24 sm:w-32 pl-1">ยอดเงิน (บาท)</div>
               {billData.items.length > 1 && <div className="w-9 flex-shrink-0" />}
             </div>
 
@@ -315,14 +316,14 @@ export default function CreateBillPage() {
                     />
                   </div>
 
-                  {/* ยอดเงิน */}
-                  <div className="w-24">
+                  {/* ยอดเงิน เปลี่ยน placeholder เป็น 0.00 เพื่อความกะทัดรัดและสวยงามบนจอเล็ก */}
+                  <div className="w-24 sm:w-32">
                     <Input
                       id={`amount-${index}`}
                       type="number"
                       inputMode="decimal"
                       step="0.01"
-                      placeholder="ระบุจำนวนเงิน"
+                      placeholder="0.00"
                       value={item.amount}
                       onChange={(e) => updateItem(index, "amount", e.target.value)}
                       required
@@ -373,26 +374,24 @@ export default function CreateBillPage() {
         </div>
 
         {/* ================================================================
-            STICKY SUBMIT BAR — ติดด้านล่างเสมอ
+            SUBMIT BAR — แสดงปกติใต้ฟอร์ม ไม่เลื่อนตามหน้าจอ
             ================================================================ */}
-        <div className="sticky bottom-0 z-50 bg-background/90 backdrop-blur-md border-t border-border/60 pb-safe">
-          <div className="max-w-lg mx-auto px-4 pt-3 pb-3">
-            <Button
-              type="submit"
-              disabled={loading}
-              className="
-                w-full h-13 text-sm font-semibold
-                bg-gradient-to-r from-indigo-600 via-indigo-600 to-violet-600
-                hover:from-indigo-500 hover:to-violet-500
-                border-none text-white rounded-2xl
-                shadow-lg shadow-indigo-600/20
-                active:scale-[0.98] transition-all duration-200
-                disabled:opacity-60
-              "
-            >
-              {loading ? "กำลังบันทึก..." : "✨ สร้างบิลและรับ QR Code สแกนจ่าย"}
-            </Button>
-          </div>
+        <div className="mt-6 mb-8 px-0.5">
+          <Button
+            type="submit"
+            disabled={loading}
+            className="
+              w-full h-13 text-sm font-semibold
+              bg-gradient-to-r from-indigo-600 via-indigo-600 to-violet-600
+              hover:from-indigo-500 hover:to-violet-500
+              border-none text-white rounded-2xl
+              shadow-lg shadow-indigo-600/20
+              active:scale-[0.98] transition-all duration-200
+              disabled:opacity-60
+            "
+          >
+            {loading ? "กำลังบันทึก..." : "✨ สร้างบิลและรับ QR Code สแกนจ่าย"}
+          </Button>
         </div>
       </form>
     </MainLayout>
