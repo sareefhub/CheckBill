@@ -15,6 +15,7 @@ import { MainLayout } from "@/layout/main-layout"
 // ประเภทข้อมูลรายการเพื่อนผู้ร่วมจ่าย
 // ============================================================
 type BillItem = {
+  id: string
   name: string
   amount: string
 }
@@ -24,6 +25,9 @@ export default function CreateBillPage() {
   const { toast } = useToast()
   const [loading, setLoading] = useState(false)
 
+  // ฟังก์ชันสุ่มค่า ID สำหรับ React Keys (แก้เรื่อง Do not use Array index in keys)
+  const generateId = () => Math.random().toString(36).substring(2, 9)
+
   // ข้อมูลตั้งต้นสำหรับสร้างบิล
   const [billData, setBillData] = useState<{
     title: string
@@ -32,14 +36,14 @@ export default function CreateBillPage() {
   }>({
     title: "",
     payeePromptPayId: "",
-    items: [{ name: "", amount: "" }],
+    items: [{ id: generateId(), name: "", amount: "" }],
   })
 
   // เพิ่มรายการเพื่อนใหม่
   const addItem = () => {
     setBillData((prev) => ({
       ...prev,
-      items: [...prev.items, { name: "", amount: "" }],
+      items: [...prev.items, { id: generateId(), name: "", amount: "" }],
     }))
   }
 
@@ -81,7 +85,7 @@ export default function CreateBillPage() {
         (item) =>
           item.name.trim() &&
           item.amount.trim() &&
-          !isNaN(Number.parseFloat(item.amount))
+          !Number.isNaN(Number.parseFloat(item.amount))
       )
 
       if (validItems.length === 0) {
@@ -107,7 +111,7 @@ export default function CreateBillPage() {
       })
 
       // บันทึกบิลลงในประวัติผู้สร้าง (localStorage)
-      if (typeof window !== "undefined") {
+      if (typeof globalThis.window !== "undefined") {
         try {
           const recentBills = JSON.parse(localStorage.getItem("recent_bills") || "[]")
           if (!recentBills.some((b: { slug: string }) => b.slug === response.publicSlug)) {
@@ -134,8 +138,8 @@ export default function CreateBillPage() {
 
   // คำนวณยอดเงินรวมขณะกรอก
   const temporaryTotal = billData.items.reduce((sum, item) => {
-    const val = parseFloat(item.amount)
-    return isNaN(val) ? sum : sum + val
+    const val = Number.parseFloat(item.amount)
+    return Number.isNaN(val) ? sum : sum + val
   }, 0)
 
   return (
@@ -157,8 +161,8 @@ export default function CreateBillPage() {
           </button>
         </Link>
         <div>
-          <h1 className="text-base font-black text-foreground">สร้างบิลใหม่</h1>
-          <p className="text-xs text-muted-foreground/90 mt-0.5">ใส่ข้อมูลบิลและรายชื่อเพื่อน</p>
+          <h1 className="text-base font-bold text-foreground">สร้างบิลใหม่</h1>
+          <p className="text-xs text-muted-foreground/80 mt-0.5">ระบุรายละเอียดบิลและเพื่อนร่วมหาร</p>
         </div>
       </div>
 
@@ -168,23 +172,23 @@ export default function CreateBillPage() {
       <form onSubmit={handleSubmit} className="flex-1 flex flex-col">
         <div className="flex-1 pt-5 pb-4 relative z-10 space-y-4">
           
-          {/* --- การ์ดหลัก: ข้อมูลบิลหลัก --- */}
+          {/* --- การ์ดหลัก: รายละเอียดบิล --- */}
           <div className="bg-card border border-border rounded-2xl p-4 space-y-4 shadow-sm relative overflow-hidden">
             <div className="flex items-center gap-2 px-0.5">
               <div className="bg-indigo-500/10 p-1.5 rounded-lg border border-indigo-500/15">
                 <Wallet className="h-4 w-4 text-indigo-400" />
               </div>
-              <span className="text-sm font-bold text-foreground">ข้อมูลบิลหลัก</span>
+              <span className="text-sm font-semibold text-foreground">รายละเอียดบิล</span>
             </div>
 
             {/* ชื่อบิล */}
             <div className="space-y-1.5">
-              <Label htmlFor="title" className="text-xs font-bold text-muted-foreground/90 pl-0.5">
-                ชื่อบิลเรียกเก็บ
+              <Label htmlFor="title" className="text-xs font-medium text-muted-foreground pl-0.5">
+                ชื่อบิลหรือรายการเรียกเก็บ
               </Label>
               <Input
                 id="title"
-                placeholder="เช่น ค่าชาบูร้านโปรด, ค่าทริปวันหยุด"
+                placeholder="เช่น ค่าอาหารมื้อพิเศษ, ค่าทริปวันหยุด"
                 value={billData.title}
                 onChange={(e) => setBillData((prev) => ({ ...prev, title: e.target.value }))}
                 required
@@ -192,20 +196,20 @@ export default function CreateBillPage() {
                   h-11 bg-secondary/40 border-border
                   focus:border-indigo-500/70 focus:ring-1 focus:ring-indigo-500/50
                   text-foreground placeholder:text-muted-foreground/60
-                  rounded-xl transition-all text-sm font-medium
+                  rounded-xl transition-all text-sm font-normal
                 "
               />
             </div>
 
             {/* เบอร์พร้อมเพย์ */}
             <div className="space-y-1.5">
-              <Label htmlFor="promptpay" className="text-xs font-bold text-muted-foreground/90 pl-0.5 flex items-center gap-1.5">
-                <Phone className="h-3 w-3" /> เบอร์พร้อมเพย์ผู้รับเงิน
+              <Label htmlFor="promptpay" className="text-xs font-medium text-muted-foreground pl-0.5 flex items-center gap-1.5">
+                <Phone className="h-3 w-3" /> หมายเลขพร้อมเพย์ผู้รับเงิน
               </Label>
               <Input
                 id="promptpay"
                 inputMode="numeric"
-                placeholder="เช่น 0812345678 หรือเลขบัตรประชาชน"
+                placeholder="ระบุเบอร์โทรศัพท์ หรือเลขบัตรประชาชน"
                 value={billData.payeePromptPayId}
                 onChange={(e) => setBillData((prev) => ({ ...prev, payeePromptPayId: e.target.value }))}
                 required
@@ -213,21 +217,21 @@ export default function CreateBillPage() {
                   h-11 bg-secondary/40 border-border
                   focus:border-indigo-500/70 focus:ring-1 focus:ring-indigo-500/50
                   text-foreground placeholder:text-muted-foreground/60
-                  rounded-xl transition-all font-mono text-sm
+                  rounded-xl transition-all font-mono text-sm font-normal
                 "
               />
             </div>
           </div>
 
-          {/* --- การ์ดรอง: รายชื่อเพื่อน --- */}
+          {/* --- การ์ดรอง: รายชื่อเพื่อนร่วมหาร --- */}
           <div className="bg-card border border-border rounded-2xl shadow-sm overflow-hidden">
             <div className="px-4 pt-4 pb-3 border-b border-border/50 flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <div className="bg-indigo-500/10 p-1.5 rounded-lg border border-indigo-500/15">
                   <UserPlus className="h-4 w-4 text-indigo-400" />
                 </div>
-                <span className="text-sm font-bold text-foreground">รายชื่อเพื่อน</span>
-                <span className="bg-indigo-500/10 border border-indigo-500/25 text-indigo-400 text-xs font-bold px-2.5 py-0.5 rounded-full">
+                <span className="text-sm font-semibold text-foreground">รายชื่อเพื่อนร่วมหาร</span>
+                <span className="bg-indigo-500/10 border border-indigo-500/25 text-indigo-400 text-xs font-semibold px-2.5 py-0.5 rounded-full">
                   {billData.items.length} คน
                 </span>
               </div>
@@ -235,21 +239,21 @@ export default function CreateBillPage() {
                 type="button"
                 onClick={addItem}
                 className="
-                  h-9 px-3.5 rounded-xl text-xs font-bold
+                  h-9 px-3.5 rounded-xl text-xs font-semibold
                   bg-indigo-600 hover:bg-indigo-500
                   text-white flex items-center gap-1
                   active:scale-95 transition-all shadow-sm shadow-indigo-600/10
                 "
               >
                 <Plus className="h-3.5 w-3.5" />
-                <span>เพิ่มคน</span>
+                <span>เพิ่มเพื่อนร่วมหาร</span>
               </button>
             </div>
 
-            {/* แถวแนะนำหัวคอลัมน์ (ปรับปรุงให้อ่านภาษาไทยง่ายขึ้น ไม่มี uppercase และ tracking-wider) */}
-            <div className="px-4 pt-2.5 pb-1 flex items-center gap-2 text-xs font-bold text-muted-foreground bg-secondary/20 border-b border-border/30">
+            {/* แถวแนะนำหัวคอลัมน์ */}
+            <div className="px-4 pt-2.5 pb-1 flex items-center gap-2 text-xs font-semibold text-muted-foreground/70 bg-secondary/20 border-b border-border/30">
               <div className="w-6 flex-shrink-0 text-center">#</div>
-              <div className="flex-1 pl-1">ชื่อเพื่อน</div>
+              <div className="flex-1 pl-1">ชื่อเพื่อนร่วมหาร</div>
               <div className="w-24 pl-1">ยอดเงิน (บาท)</div>
               {billData.items.length > 1 && <div className="w-9 flex-shrink-0" />}
             </div>
@@ -258,19 +262,19 @@ export default function CreateBillPage() {
             <div className="divide-y divide-border/30 px-2 py-1.5 space-y-1">
               {billData.items.map((item, index) => (
                 <div
-                  key={index}
+                  key={item.id}
                   className="px-2 py-1 flex items-center gap-2 animate-in fade-in duration-150"
                 >
                   {/* ลำดับตัวเลขวงกลมมน */}
                   <div className="w-6 h-6 rounded-full bg-secondary border border-border/80 flex items-center justify-center flex-shrink-0">
-                    <span className="text-[10px] font-bold text-muted-foreground">{index + 1}</span>
+                    <span className="text-xs font-semibold text-muted-foreground/80">{index + 1}</span>
                   </div>
 
                   {/* ชื่อเพื่อน */}
                   <div className="flex-1">
                     <Input
                       id={`name-${index}`}
-                      placeholder="เช่น สมชาย, เกรซ"
+                      placeholder="กรอกชื่อเพื่อน"
                       value={item.name}
                       onChange={(e) => updateItem(index, "name", e.target.value)}
                       required
@@ -278,7 +282,7 @@ export default function CreateBillPage() {
                         h-10 bg-secondary/40 border-border
                         focus:border-indigo-500/60 focus:ring-1 focus:ring-indigo-500/50
                         text-foreground placeholder:text-muted-foreground/60
-                        rounded-xl text-sm font-medium
+                        rounded-xl text-sm font-normal
                       "
                     />
                   </div>
@@ -290,7 +294,7 @@ export default function CreateBillPage() {
                       type="number"
                       inputMode="decimal"
                       step="0.01"
-                      placeholder="0.00"
+                      placeholder="ระบุจำนวนเงิน"
                       value={item.amount}
                       onChange={(e) => updateItem(index, "amount", e.target.value)}
                       required
@@ -298,7 +302,10 @@ export default function CreateBillPage() {
                         h-10 bg-secondary/40 border-border
                         focus:border-indigo-500/60 focus:ring-1 focus:ring-indigo-500/50
                         text-foreground placeholder:text-muted-foreground/60
-                        rounded-xl font-mono text-sm
+                        rounded-xl font-mono text-sm font-normal
+                        [appearance:textfield]
+                        [&::-webkit-outer-spin-button]:appearance-none
+                        [&::-webkit-inner-spin-button]:appearance-none
                       "
                     />
                   </div>
@@ -326,10 +333,10 @@ export default function CreateBillPage() {
             {/* สรุปยอดรวมชั่วคราว */}
             {temporaryTotal > 0 && (
               <div className="mx-4 mb-4 mt-2.5 flex justify-between items-center p-3 bg-indigo-500/8 dark:bg-indigo-500/10 border border-indigo-500/20 rounded-xl">
-                <span className="text-xs font-bold text-indigo-400 flex items-center gap-1.5">
-                  <Coins className="h-3.5 w-3.5" /> ยอดรวมทั้งหมด
+                <span className="text-xs font-semibold text-indigo-400 flex items-center gap-1.5">
+                  <Coins className="h-3.5 w-3.5" /> ยอดเงินรวมทั้งหมด
                 </span>
-                <span className="text-sm font-mono font-black text-indigo-400">
+                <span className="text-sm font-mono font-bold text-indigo-400">
                   ฿{temporaryTotal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 </span>
               </div>
@@ -346,7 +353,7 @@ export default function CreateBillPage() {
               type="submit"
               disabled={loading}
               className="
-                w-full h-13 text-sm font-bold
+                w-full h-13 text-sm font-semibold
                 bg-gradient-to-r from-indigo-600 via-indigo-600 to-violet-600
                 hover:from-indigo-500 hover:to-violet-500
                 border-none text-white rounded-2xl
@@ -355,7 +362,7 @@ export default function CreateBillPage() {
                 disabled:opacity-60
               "
             >
-              {loading ? "กำลังบันทึก..." : "✨ สร้างบิลและรับ QR Code"}
+              {loading ? "กำลังบันทึก..." : "✨ สร้างบิลและรับ QR Code สแกนจ่าย"}
             </Button>
           </div>
         </div>
