@@ -46,25 +46,27 @@ export function SlipPreviewDialog({
                   />
                 </div>
               )}
-              <div className="bg-background border border-border rounded-2xl p-3.5 space-y-2 text-xs">
+              <div className="w-full bg-secondary/20 border border-border/60 rounded-2xl p-4 space-y-3 text-xs">
                 <div className="flex justify-between items-center">
-                  <span className="text-muted-foreground">สถานะ:</span>
-                  <Badge className="bg-emerald-500/10 border-emerald-500/30 text-emerald-400 h-5 text-[10px] font-semibold">
+                  <span className="text-xs font-medium text-muted-foreground/90">สถานะ</span>
+                  <Badge className="bg-emerald-500/10 border-emerald-500/20 text-emerald-600 h-5 text-[10px] font-semibold">
                     อนุมัติแล้ว ✓
                   </Badge>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">ยอดเงิน:</span>
-                  <span className="text-emerald-400 font-mono font-bold">
+                <div className="flex justify-between items-center border-t border-border/30 pt-2.5">
+                  <span className="text-xs font-medium text-muted-foreground/90">ยอดเงิน</span>
+                  <span className="text-base font-bold text-emerald-600">
                     ฿{amount?.toLocaleString(undefined, { minimumFractionDigits: 2 })}
                   </span>
                 </div>
-                <div className="flex justify-between border-t border-border pt-2 font-mono">
-                  <span className="text-muted-foreground">รหัสทำรายการ:</span>
-                  <span className="text-foreground text-[10px] break-all max-w-[55%] text-right">
-                    {bankRef}
-                  </span>
-                </div>
+                {bankRef && (
+                  <div className="flex justify-between items-start border-t border-border/30 pt-2.5">
+                    <span className="text-xs font-medium text-muted-foreground/90 mt-0.5">รหัสทำรายการ</span>
+                    <span className="text-[11px] font-normal text-muted-foreground break-all max-w-[65%] text-right leading-relaxed">
+                      {bankRef}
+                    </span>
+                  </div>
+                )}
               </div>
             </>
           )}

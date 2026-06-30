@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge"
 import { billApi, paymentApi, uploadSlip } from "@/lib/api"
 import { useToast } from "@/hooks/use-toast"
 import { Button } from "@/components/ui/button"
-import { ArrowLeft, Lock, Unlock, Copy, Check, FileText, Wallet } from "lucide-react"
+import { ArrowLeft, Lock, Unlock, Copy, Check, FileText, Wallet, ChevronRight } from "lucide-react"
 import QRCode from "qrcode"
 import { MainLayout } from "@/layout/main-layout"
 
@@ -306,24 +306,30 @@ export default function ViewBillPage() {
             )}
           </div>
 
+          {/* ปุ่มแชร์ */}
           <button
             onClick={handleCopyLink}
             className="
-              bg-card border border-border rounded-2xl p-3.5
-              flex flex-col items-start justify-between
-              hover:border-indigo-500/40 active:scale-[0.98]
-              transition-all
+              bg-card border border-border rounded-2xl p-3
+              flex items-center justify-between gap-2 w-full
+              hover:border-indigo-500/40 hover:bg-secondary/20 active:scale-[0.98]
+              transition-all text-left
             "
           >
-            <div className="flex items-center gap-1.5">
-              {copied ? <Check className="h-4 w-4 text-emerald-400" /> : <Copy className="h-4 w-4 text-indigo-400" />}
-              <span className="text-xs font-semibold text-muted-foreground/80">
-                {copied ? "คัดลอกแล้ว!" : "แชร์ลิงก์"}
-              </span>
+            <div className="flex flex-col justify-between min-w-0">
+              <div className="flex items-center gap-1.5">
+                {copied ? <Check className="h-4 w-4 text-emerald-400" /> : <Copy className="h-4 w-4 text-indigo-400" />}
+                <span className="text-xs font-semibold text-muted-foreground/80">
+                  {copied ? "คัดลอกแล้ว!" : "แชร์ลิงก์"}
+                </span>
+              </div>
+              <p className="text-xs text-foreground font-bold mt-1 truncate">
+                {copied ? "ลิงก์อยู่ในคลิปบอร์ด" : "กดเพื่อคัดลอก URL"}
+              </p>
             </div>
-            <p className="text-xs text-foreground font-semibold mt-1">
-              {copied ? "ลิงก์อยู่ในคลิปบอร์ด" : "กดเพื่อคัดลอก URL"}
-            </p>
+            <div className="bg-indigo-500/10 p-1.5 rounded-xl border border-indigo-500/10 flex-shrink-0">
+              <ChevronRight className="h-3.5 w-3.5 text-indigo-400" />
+            </div>
           </button>
         </div>
 
