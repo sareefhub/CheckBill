@@ -71,11 +71,11 @@ export default function BillSummaryPage() {
 
   if (!bill) {
     return (
-      <div className="min-h-screen bg-slate-955 text-slate-100 flex items-center justify-center">
+      <div className="min-h-screen bg-slate-950 text-slate-100 flex items-center justify-center">
         <div className="text-center space-y-4">
           <h1 className="text-2xl font-bold">ไม่พบข้อมูลของบิลนี้ในฐานข้อมูล</h1>
           <Link href={`/bills/${slug}`}>
-            <Button className="bg-indigo-600 hover:bg-indigo-500">กลับไปหน้าบิล</Button>
+            <Button className="bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 border-none text-white rounded-xl">กลับไปหน้าบิล</Button>
           </Link>
         </div>
       </div>
@@ -92,9 +92,10 @@ export default function BillSummaryPage() {
   const completionRate = totalItems > 0 ? Math.round((paid.length / totalItems) * 100) : 0
 
   return (
-    <div className="min-h-screen bg-slate-955 text-slate-100 relative overflow-hidden pb-12">
+    <div className="min-h-screen bg-slate-950 text-slate-100 relative overflow-hidden pb-12">
       {/* แสงสปอตไลท์ตกแต่งพื้นหลัง */}
       <div className="absolute top-[-15%] right-[-10%] w-[55%] h-[55%] rounded-full bg-violet-500/5 blur-[140px] pointer-events-none" />
+      <div className="absolute bottom-[-10%] left-[-10%] w-[45%] h-[45%] rounded-full bg-indigo-500/5 blur-[120px] pointer-events-none" />
 
       <div className="container mx-auto px-4 py-8 max-w-4xl relative z-10">
         

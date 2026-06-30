@@ -307,16 +307,19 @@ export default function ViewBillPage() {
       <div className="min-h-screen bg-slate-950 text-slate-100 flex items-center justify-center">
         <div className="text-center space-y-4">
           <h2 className="text-2xl font-bold">ไม่พบบิลที่คุณระบุในระบบ</h2>
-          <Link href="/"><Button className="bg-indigo-600 hover:bg-indigo-500">กลับไปหน้าแรก</Button></Link>
+          <Link href="/">
+            <Button className="bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 border-none text-white rounded-xl">กลับไปหน้าแรก</Button>
+          </Link>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-slate-955 text-slate-100 relative overflow-hidden pb-12">
+    <div className="min-h-screen bg-slate-950 text-slate-100 relative overflow-hidden pb-12">
       {/* แสงสปอตไลท์ตกแต่งพื้นหลัง */}
       <div className="absolute top-[-15%] left-[-10%] w-[50%] h-[50%] rounded-full bg-indigo-500/5 blur-[130px] pointer-events-none" />
+      <div className="absolute bottom-[-10%] right-[-10%] w-[45%] h-[45%] rounded-full bg-violet-500/5 blur-[120px] pointer-events-none" />
 
       <div className="container mx-auto px-4 py-8 max-w-4xl relative z-10">
         

@@ -10,9 +10,8 @@ const kanit = Kanit({
 })
 
 export const metadata: Metadata = {
-  title: 'CheckBill',
-  description: 'Created with v0',
-  generator: 'v0.app',
+  title: 'CheckBill — หารบิลกับเพื่อนอย่างชาญฉลาด',
+  description: 'ระบบหารบิลออนไลน์ พร้อม QR Code PromptPay และตรวจสอบสลิปอัตโนมัติ',
 }
 
 export default function RootLayout({
@@ -21,7 +20,7 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" className={`${kanit.variable} dark`}>
+    <html lang="th" className={`${kanit.variable} dark`}>
       <body>{children}</body>
     </html>
   )
