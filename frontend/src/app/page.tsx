@@ -26,7 +26,7 @@ export default function HomePage() {
 
   // โหลดประวัติบิลจาก localStorage หลังเปิดหน้าเว็บ
   useEffect(() => {
-    if (typeof window !== "undefined") {
+    if (globalThis.window !== undefined) {
       const stored = localStorage.getItem("recent_bills")
       if (stored) {
         try {
@@ -41,7 +41,7 @@ export default function HomePage() {
   // นำทางไปหน้าบิลตาม slug ที่พิมพ์
   const handleSearch = () => {
     if (slug.trim()) {
-      window.location.href = `/bills/${slug.trim()}`
+      globalThis.location.href = `/bills/${slug.trim()}`
     }
   }
 

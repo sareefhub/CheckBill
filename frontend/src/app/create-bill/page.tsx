@@ -2,14 +2,14 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
+import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Plus, Trash2, ArrowLeft, UserPlus, Coins, Wallet, Phone } from "lucide-react"
-import Link from "next/link"
+import { Plus, Trash2, UserPlus, Coins, Wallet, Phone, ArrowLeft } from "lucide-react"
 import { billApi } from "@/lib/api"
 import { useToast } from "@/hooks/use-toast"
-import { ThemeToggle } from "@/components/theme-toggle"
+import { MainLayout } from "@/layout/main-layout"
 
 // ============================================================
 // ประเภทข้อมูลรายการเพื่อนผู้ร่วมจ่าย
@@ -134,39 +134,28 @@ export default function CreateBillPage() {
   }, 0)
 
   return (
-    <div className="min-h-screen bg-background text-foreground flex flex-col">
+    <MainLayout>
 
-      {/* === แสงตกแต่งพื้นหลัง === */}
-      <div className="fixed top-[-25%] left-[-10%] w-[60%] h-[60%] rounded-full bg-indigo-500/6 blur-[150px] pointer-events-none dark:bg-indigo-500/5" />
-      <div className="fixed bottom-[-10%] right-[-10%] w-[50%] h-[50%] rounded-full bg-violet-500/6 blur-[130px] pointer-events-none dark:bg-violet-500/5" />
-
-      {/* ================================================================
-          HEADER — sticky top
-          ================================================================ */}
-      <header className="sticky top-0 z-50 w-full border-b border-border/60 bg-background/80 backdrop-blur-md">
-        <div className="max-w-lg mx-auto px-4 h-14 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Link href="/">
-              <button
-                aria-label="ย้อนกลับ"
-                className="
-                  w-10 h-10 rounded-xl flex items-center justify-center
-                  bg-secondary/60 border border-border
-                  hover:bg-secondary transition-all active:scale-95
-                  text-muted-foreground hover:text-foreground
-                "
-              >
-                <ArrowLeft className="h-5 w-5" />
-              </button>
-            </Link>
-            <div>
-              <h1 className="text-base font-black text-foreground">สร้างบิลใหม่</h1>
-              <p className="text-[11px] text-muted-foreground leading-none">ใส่ข้อมูลบิลและรายชื่อเพื่อน</p>
-            </div>
-          </div>
-          <ThemeToggle />
+      {/* small page header (inside main layout) */}
+      <div className="flex items-center gap-2 mb-2">
+        <Link href="/">
+          <button
+            aria-label="ย้อนกลับ"
+            className={`
+              w-10 h-10 rounded-xl flex items-center justify-center
+              bg-secondary/60 border border-border
+              hover:bg-secondary transition-all active:scale-95
+              text-muted-foreground hover:text-foreground
+            `}
+          >
+            <ArrowLeft className="h-5 w-5" />
+          </button>
+        </Link>
+        <div>
+          <h1 className="text-base font-black text-foreground">สร้างบิลใหม่</h1>
+          <p className="text-[11px] text-muted-foreground leading-none">ใส่ข้อมูลบิลและรายชื่อเพื่อน</p>
         </div>
-      </header>
+      </div>
 
       {/* ================================================================
           FORM CONTENT
@@ -367,6 +356,6 @@ export default function CreateBillPage() {
           </div>
         </div>
       </form>
-    </div>
+    </MainLayout>
   )
 }

@@ -5,7 +5,7 @@ import { Footer } from "@/components/footer"
 // MainLayout — โครงสร้างหลักของทุกหน้า
 // รวม Navbar, พื้นหลังตกแต่ง, และ Footer ไว้ในที่เดียว
 // ============================================================
-export function MainLayout({ children }: { children: React.ReactNode }) {
+export function MainLayout({ children }: { readonly children: React.ReactNode }) {
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col relative overflow-hidden">
 
