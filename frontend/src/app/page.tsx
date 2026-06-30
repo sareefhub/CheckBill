@@ -54,10 +54,10 @@ export default function HomePage() {
   return (
     <MainLayout>
 
-      {/* --- Hero Section (Compact Mobile) --- */}
+      {/* --- ส่วนหัวข้อหลัก Hero Section (กะทัดรัดสำหรับมือถือ) --- */}
       <div className="text-center space-y-2 pt-2">
         <h1 className="text-3xl font-black tracking-tight bg-gradient-to-r from-foreground via-foreground/90 to-indigo-400 bg-clip-text text-transparent">
-          หารบิลกับเพื่อน
+          เช็คบิล
         </h1>
         <p className="text-sm text-muted-foreground leading-relaxed">
           สร้าง QR Code พร้อมเพย์ และตรวจสอบสลิปอัตโนมัติ
