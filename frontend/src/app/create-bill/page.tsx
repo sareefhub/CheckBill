@@ -6,7 +6,7 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Plus, Trash2, UserPlus, Coins, Wallet, Phone, ArrowLeft } from "lucide-react"
+import { Plus, Trash2, UserPlus, Coins, Wallet, Phone, ArrowLeft, User } from "lucide-react"
 import { billApi } from "@/lib/api"
 import { useToast } from "@/hooks/use-toast"
 import { MainLayout } from "@/layout/main-layout"
@@ -31,10 +31,12 @@ export default function CreateBillPage() {
   // ข้อมูลตั้งต้นสำหรับสร้างบิล
   const [billData, setBillData] = useState<{
     title: string
+    payeeName: string
     payeePromptPayId: string
     items: BillItem[]
   }>({
     title: "",
+    payeeName: "",
     payeePromptPayId: "",
     items: [{ id: generateId(), name: "", amount: "" }],
   })

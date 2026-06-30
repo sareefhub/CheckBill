@@ -6,10 +6,10 @@ import crypto from 'crypto';
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { title, payeePromptPayId, items } = body;
+    const { title, payeeName, payeePromptPayId, items } = body;
 
     // ตรวจสอบความถูกต้องของข้อมูลนำเข้า
-    if (!title || !payeePromptPayId || !Array.isArray(items)) {
+    if (!title || !payeeName || !payeePromptPayId || !Array.isArray(items)) {
       return NextResponse.json({ error: 'ข้อมูลสำหรับสร้างบิลไม่ถูกต้อง' }, { status: 400 });
     }
 
@@ -20,6 +20,7 @@ export async function POST(req: NextRequest) {
     const bill = await prisma.bill.create({
       data: {
         title,
+        payeeName,
         payeePromptPayId,
         currency: 'THB',
         publicSlug,

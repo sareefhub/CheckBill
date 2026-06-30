@@ -38,9 +38,9 @@ export async function PUT(
   try {
     const { slug } = await params;
     const body = await req.json();
-    const { title, payeePromptPayId, items } = body;
+    const { title, payeeName, payeePromptPayId, items } = body;
 
-    if (!title || !payeePromptPayId || !Array.isArray(items)) {
+    if (!title || !payeeName || !payeePromptPayId || !Array.isArray(items)) {
       return NextResponse.json({ error: 'ข้อมูลสำหรับอัปเดตบิลไม่ถูกต้อง' }, { status: 400 });
     }
 
@@ -61,6 +61,7 @@ export async function PUT(
         where: { id: bill.id },
         data: {
           title,
+          payeeName,
           payeePromptPayId,
         },
       });

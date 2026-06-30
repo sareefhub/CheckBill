@@ -11,6 +11,7 @@ generator client {
 model Bill {
   id                BigInt     @id @default(autoincrement()) @map("ID")
   title             String     @db.VarChar(120) @map("TITLE")
+  payeeName         String?    @map("PAYEE_NAME") @db.VarChar(120)
   payeePromptPayId  String     @map("PAYEE_PROMPTPAY_ID") @db.VarChar(30)
   currency          String     @default("THB") @db.VarChar(8) @map("CURRENCY")
   publicSlug        String     @unique @map("PUBLIC_SLUG") @db.VarChar(64)
