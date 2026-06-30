@@ -7,11 +7,14 @@ import { Footer } from "@/components/footer"
 // ============================================================
 export function MainLayout({ children }: { readonly children: React.ReactNode }) {
   return (
-    <div className="min-h-screen bg-background text-foreground flex flex-col relative overflow-hidden">
+    <div className="min-h-screen bg-background text-foreground flex flex-col relative">
 
       {/* === แสงตกแต่งพื้นหลัง === */}
-      <div className="absolute top-[-10%] left-[-10%] w-[60%] h-[60%] rounded-full bg-indigo-500/8 blur-[120px] pointer-events-none dark:bg-indigo-500/10" />
-      <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] rounded-full bg-violet-500/8 blur-[120px] pointer-events-none dark:bg-violet-500/10" />
+      {/* ใช้ wrapper ครอบเพื่อจำกัดขอบเขตของแสงตกแต่งไม่ให้ล้นจอ (overflow-hidden) โดยไม่ส่งผลกระทบกับตำแหน่ง sticky ของ Navbar */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
+        <div className="absolute top-[-10%] left-[-10%] w-[60%] h-[60%] rounded-full bg-indigo-500/8 blur-[120px] dark:bg-indigo-500/10" />
+        <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] rounded-full bg-violet-500/8 blur-[120px] dark:bg-violet-500/10" />
+      </div>
 
       <Navbar />
 
