@@ -55,11 +55,11 @@ export default function HomePage() {
     <MainLayout>
 
       {/* --- ส่วนหัวข้อหลัก Hero Section (กะทัดรัดสำหรับมือถือ) --- */}
-      <div className="text-center space-y-2 pt-2">
-        <h1 className="text-3xl font-black tracking-tight bg-gradient-to-r from-foreground via-foreground/90 to-indigo-400 bg-clip-text text-transparent">
+      <div className="text-center space-y-2 pt-3 pb-1">
+        <h1 className="text-4xl font-extrabold tracking-tight bg-gradient-to-r from-foreground via-foreground/90 to-indigo-400 bg-clip-text text-transparent">
           เช็คบิล
         </h1>
-        <p className="text-sm text-muted-foreground leading-relaxed">
+        <p className="text-base text-muted-foreground/90 font-medium leading-relaxed">
           สร้าง QR Code พร้อมเพย์ และตรวจสอบสลิปอัตโนมัติ
         </p>
       </div>
@@ -81,7 +81,7 @@ export default function HomePage() {
             </div>
             <div className="flex-1 min-w-0">
               <p className="font-bold text-white text-base">สร้างบิลใหม่</p>
-              <p className="text-indigo-100/80 text-xs mt-0.5 truncate">
+              <p className="text-indigo-50/95 text-sm mt-0.5 truncate font-medium">
                 ใส่ชื่อ เพื่อน และยอดเงิน แล้วแชร์ลิงก์
               </p>
             </div>
@@ -99,7 +99,8 @@ export default function HomePage() {
             <Search className="h-5 w-5 text-indigo-400" />
           </div>
           <div className="flex-1 min-w-0">
-            <p className="font-bold text-foreground text-sm mb-2">ดูบิลเดิมด้วยรหัส</p>
+            {/* ขยายหัวข้อการ์ดให้อ่านง่ายขึ้น */}
+            <p className="font-bold text-foreground text-base mb-2">ดูบิลเดิมด้วยรหัส</p>
             <div className="flex gap-2">
               <input
                 id="slug-input"
@@ -110,10 +111,10 @@ export default function HomePage() {
                 onChange={(e) => setSlug(e.target.value)}
                 onKeyDown={(e) => { if (e.key === "Enter") handleSearch() }}
                 className="
-                  flex-1 h-11 px-3 rounded-xl text-sm
+                  flex-1 h-11 px-3 rounded-xl text-base
                   bg-background border border-border
                   focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/50
-                  text-foreground placeholder:text-muted-foreground
+                  text-foreground placeholder:text-muted-foreground/85
                   transition-all outline-none
                 "
               />
@@ -138,19 +139,20 @@ export default function HomePage() {
       {recentBills.length > 0 && (
         <div className="space-y-2">
           <div className="flex items-center justify-between px-1">
-            <h2 className="text-sm font-bold text-foreground flex items-center gap-1.5">
-              <Clock className="h-3.5 w-3.5 text-indigo-400" />
+            {/* ปรับขนาดหัวข้อบิลล่าสุดให้อ่านง่ายขึ้น */}
+            <h2 className="text-base font-bold text-foreground flex items-center gap-1.5">
+              <Clock className="h-4 w-4 text-indigo-400" />
               บิลล่าสุด
             </h2>
             <button
               onClick={handleClearHistory}
               className="
-                flex items-center gap-1 text-xs text-muted-foreground
+                flex items-center gap-1 text-sm font-medium text-muted-foreground
                 hover:text-destructive transition-colors px-2 py-1 rounded-lg
                 hover:bg-destructive/10 active:scale-95 min-h-8
               "
             >
-              <Trash2 className="h-3 w-3" />
+              <Trash2 className="h-3.5 w-3.5" />
               ล้างประวัติ
             </button>
           </div>
@@ -178,21 +180,21 @@ export default function HomePage() {
 
                 {/* ข้อมูลบิล */}
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold text-foreground truncate group-hover:text-indigo-400 transition-colors">
+                  <p className="text-base font-semibold text-foreground truncate group-hover:text-indigo-400 transition-colors">
                     {b.title}
                   </p>
-                  <p className="text-[11px] text-muted-foreground font-mono mt-0.5">
+                  <p className="text-xs text-muted-foreground/90 font-mono mt-0.5">
                     {b.slug} · {new Date(b.createdAt).toLocaleDateString("th-TH")}
                   </p>
                 </div>
-
+ 
                 <div className="flex items-center gap-2 flex-shrink-0">
                   {b.role === "creator" ? (
-                    <Badge className="bg-indigo-500/10 border-indigo-500/25 text-indigo-400 text-[10px] h-5 px-1.5">
+                    <Badge className="bg-indigo-500/10 border-indigo-500/25 text-indigo-400 text-[11px] font-medium h-5.5 px-1.5">
                       ผู้สร้าง
                     </Badge>
                   ) : (
-                    <Badge className="bg-secondary border-border text-muted-foreground text-[10px] h-5 px-1.5">
+                    <Badge className="bg-secondary border-border text-muted-foreground text-[11px] font-medium h-5.5 px-1.5">
                       ผู้เข้าดู
                     </Badge>
                   )}
@@ -206,7 +208,8 @@ export default function HomePage() {
 
       {/* --- วิธีใช้งาน (How It Works) --- */}
       <div className="space-y-3">
-        <h2 className="text-sm font-bold text-foreground px-1">ใช้งานยังไง?</h2>
+        {/* ปรับขนาดหัวข้อวิธีใช้งานให้อ่านง่ายและชัดเจนขึ้น */}
+        <h2 className="text-base font-bold text-foreground px-1">ใช้งานยังไง?</h2>
         <div className="space-y-2">
           {[
             { num: "1", icon: Receipt, title: "ใส่ข้อมูลบิล", desc: "ชื่อบิล เบอร์พร้อมเพย์ และรายชื่อเพื่อนพร้อมยอดเงิน" },
@@ -221,11 +224,11 @@ export default function HomePage() {
                 <span className="text-indigo-400 font-black text-base">{step.num}</span>
               </div>
               <div className="flex-1 min-w-0 pt-0.5">
-                <p className="font-bold text-foreground text-sm flex items-center gap-1.5">
-                  <step.icon className="h-3.5 w-3.5 text-indigo-400" />
+                <p className="font-bold text-foreground text-base flex items-center gap-1.5">
+                  <step.icon className="h-4 w-4 text-indigo-400" />
                   {step.title}
                 </p>
-                <p className="text-muted-foreground text-xs mt-1 leading-relaxed">{step.desc}</p>
+                <p className="text-muted-foreground/90 text-sm mt-1 leading-relaxed">{step.desc}</p>
               </div>
             </div>
           ))}

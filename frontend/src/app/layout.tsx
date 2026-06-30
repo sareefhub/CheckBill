@@ -13,7 +13,7 @@ const kanit = Kanit({
 
 export const metadata: Metadata = {
   // กำหนดชื่อเว็บและรายละเอียดสำหรับ SEO
-  title: 'CheckBill — เช็คบิลอย่างชาญฉลาด',
+  title: 'CheckBill',
   description: 'ระบบเช็คบิลออนไลน์ พร้อม QR Code PromptPay และตรวจสอบสลิปอัตโนมัติ',
 }
 
