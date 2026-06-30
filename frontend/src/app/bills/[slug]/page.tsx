@@ -35,6 +35,7 @@ interface Bill {
   title: string
   publicSlug: string
   status: "OPEN" | "CLOSED"
+  payeeName?: string | null
   payeePromptPayId: string
   items: BillItem[]
 }
@@ -472,10 +473,17 @@ export default function ViewBillPage() {
 
         {/* --- ข้อมูลพร้อมเพย์ + เครื่องมือ --- */}
         <div className="grid grid-cols-2 gap-3">
-          {/* PromptPay ID */}
-          <div className="bg-card border border-border rounded-2xl p-3.5">
-            <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-1">พร้อมเพย์รับเงิน</p>
-            <p className="text-sm font-mono font-bold text-foreground truncate">{bill.payeePromptPayId}</p>
+          {/* PromptPay ID + Payee Name */}
+          <div className="bg-card border border-border rounded-2xl p-3 flex flex-col justify-center min-w-0">
+            <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-0.5">ผู้รับเงิน</p>
+            {bill.payeeName ? (
+              <>
+                <p className="text-xs font-bold text-foreground truncate leading-snug">{bill.payeeName}</p>
+                <p className="text-[11px] font-mono text-muted-foreground mt-0.5">{bill.payeePromptPayId}</p>
+              </>
+            ) : (
+              <p className="text-sm font-mono font-bold text-foreground truncate">{bill.payeePromptPayId}</p>
+            )}
           </div>
 
           {/* ปุ่มแชร์ */}
@@ -601,8 +609,14 @@ export default function ViewBillPage() {
 
             {qrDialog.data && (
               <div className="w-full bg-background border border-border rounded-2xl p-3.5 space-y-2 text-xs font-medium">
+                {bill.payeeName && (
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">ผู้รับเงิน:</span>
+                    <span className="text-foreground font-bold">{bill.payeeName}</span>
+                  </div>
+                )}
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">ผู้รับเงิน:</span>
+                  <span className="text-muted-foreground">พร้อมเพย์:</span>
                   <span className="text-foreground font-mono">{bill.payeePromptPayId}</span>
                 </div>
                 <div className="flex justify-between">

@@ -77,6 +77,11 @@ export default function CreateBillPage() {
         setLoading(false)
         return
       }
+      if (!billData.payeeName.trim()) {
+        toast({ title: "ข้อมูลไม่ครบถ้วน", description: "กรุณาใส่ชื่อผู้รับเงินด้วยนะครับ", variant: "destructive" })
+        setLoading(false)
+        return
+      }
       if (!billData.payeePromptPayId.trim()) {
         toast({ title: "ข้อมูลไม่ครบถ้วน", description: "กรุณาใส่เบอร์พร้อมเพย์สำหรับรับเงินนะครับ", variant: "destructive" })
         setLoading(false)
@@ -98,6 +103,7 @@ export default function CreateBillPage() {
 
       const apiData = {
         title: billData.title.trim(),
+        payeeName: billData.payeeName.trim(),
         payeePromptPayId: billData.payeePromptPayId.trim(),
         items: validItems.map((item) => ({
           displayName: item.name.trim(),
@@ -193,6 +199,26 @@ export default function CreateBillPage() {
                 placeholder="เช่น ค่าอาหารมื้อพิเศษ, ค่าทริปท่องเที่ยว"
                 value={billData.title}
                 onChange={(e) => setBillData((prev) => ({ ...prev, title: e.target.value }))}
+                required
+                className="
+                  h-11 bg-secondary/40 border-border
+                  focus:border-indigo-500/70 focus:ring-1 focus:ring-indigo-500/50
+                  text-foreground placeholder:text-muted-foreground/75
+                  rounded-xl transition-all text-sm font-normal
+                "
+              />
+            </div>
+
+            {/* ชื่อผู้รับเงิน */}
+            <div className="space-y-1.5">
+              <Label htmlFor="payeeName" className="text-sm font-bold text-foreground/90 pl-0.5 flex items-center gap-1.5">
+                <User className="h-3.5 w-3.5 text-indigo-400" /> ชื่อผู้รับเงิน (ชื่อบัญชีปลายทาง)
+              </Label>
+              <Input
+                id="payeeName"
+                placeholder="เช่น นายสมชาย ใจดี"
+                value={billData.payeeName}
+                onChange={(e) => setBillData((prev) => ({ ...prev, payeeName: e.target.value }))}
                 required
                 className="
                   h-11 bg-secondary/40 border-border
