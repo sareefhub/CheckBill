@@ -31,3 +31,6 @@ pnpm-lock.yaml
 
 # backup
 /backend-java-backup
+
+# agents & skills
+.agents/
