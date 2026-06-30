@@ -1,0 +1,10 @@
+# backups
+backend-java-backup/
+
+# local environment files
+frontend/.env
+frontend/.env.local
+
+# system files
+.DS_Store
+Thumbs.db
