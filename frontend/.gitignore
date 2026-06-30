@@ -1,36 +1,44 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
-# dependencies
+# 1. dependencies (ไฟล์ไลบรารีขนาดใหญ่)
 /node_modules
 
-# next.js
+# 2. next.js build output & cache (โฟลเดอร์แคชการทำงาน)
 /.next/
 /out/
-
-# production
 /build
 
-# debug
+# 3. debug logs (บันทึกข้อผิดพลาดในการติดตั้ง)
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# env files
-.env*
-
-# vercel
+# 4. vercel configuration (การตั้งค่า Vercel)
 .vercel
 
-# typescript
+# 5. typescript configuration
 *.tsbuildinfo
 next-env.d.ts
 
-# lockfile
+# 6. lockfile (ตามความต้องการที่ไม่อยาก push)
 pnpm-lock.yaml
 
-# backup
+# 7. local backups & agent tools (โฟลเดอร์สำรองข้อมูลและโฟลเดอร์ของ AI)
 /backend-java-backup
-
-# agents & skills
 .agents/
+
+# 8. CRITICAL: Security & Privacy (ความปลอดภัยและการป้องกันข้อมูลรั่วไหล)
+# ------------------------------------------------------------
+# ละเว้นไฟล์เก็บรหัสผ่านฐานข้อมูล Supabase และค่า Config ลับทั้งหมด
+.env
+.env.local
+.env.development.local
+.env.production.local
+.env.test.local
+.env*.local
+
+# ละเว้นรูปภาพสลิปโอนเงินส่วนตัวของเพื่อนๆ ที่ถูกอัปโหลดเข้ามาใช้งานจริง
+# เพื่อป้องกันไม่ให้ข้อมูลทางการเงินรั่วไหลขึ้นไปบน GitHub สาธารณะ
+/public/uploads/
+# ------------------------------------------------------------
