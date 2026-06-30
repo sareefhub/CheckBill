@@ -387,7 +387,6 @@ export default function ViewBillPage() {
       </div>
     )
   }
-
   return (
     <MainLayout
       customHeader={

@@ -23,7 +23,7 @@ export function MainLayout({ children, customHeader }: MainLayoutProps) {
 
       {customHeader ?? <Navbar />}
 
-      {/* เนื้อหาหลักของแต่ละหน้า */}
+      {/* เนื้อหาหลักของแต่ละหน้า — ควบคุมความกว้างสูงสุดและจัดกึ่งกลางไว้ที่นี่จุดเดียวเพื่อความสม่ำเสมอของเนื้อหา */}
       <main className="flex-1 max-w-lg mx-auto w-full px-4 pt-6 pb-safe-lg relative z-10 space-y-6">
         {children}
       </main>

@@ -161,69 +161,69 @@ export default function CreateBillPage() {
           FORM CONTENT
           ================================================================ */}
       <form onSubmit={handleSubmit} className="flex-1 flex flex-col">
-        <div className="flex-1 max-w-lg mx-auto w-full px-4 pt-5 pb-4 relative z-10 space-y-4">
+        <div className="flex-1 pt-5 pb-4 relative z-10 space-y-4">
 
           {/* --- Section: ข้อมูลบิลหลัก --- */}
-          <div className="bg-card border border-border rounded-2xl overflow-hidden">
-            {/* แถบสี gradient ด้านบน card */}
-            <div className="h-1 w-full bg-gradient-to-r from-indigo-500 via-purple-500 to-violet-500" />
-
-            <div className="p-4 space-y-4">
-              <div className="flex items-center gap-2 mb-1">
+          <div className="bg-card border border-border rounded-2xl p-4 space-y-4 shadow-sm relative overflow-hidden">
+            {/* กล่องไอคอนและหัวข้อการ์ดเพื่อความเป็นระบบและระเบียบสายตา */}
+            <div className="flex items-center gap-2 px-0.5">
+              <div className="bg-indigo-500/10 p-1.5 rounded-lg border border-indigo-500/15">
                 <Wallet className="h-4 w-4 text-indigo-400" />
-                <span className="text-sm font-bold text-foreground">ข้อมูลบิลหลัก</span>
               </div>
+              <span className="text-sm font-bold text-foreground">ข้อมูลบิลหลัก</span>
+            </div>
 
-              {/* ชื่อบิล */}
-              <div className="space-y-1.5">
-                <Label htmlFor="title" className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
-                  ชื่อบิลเรียกเก็บ
-                </Label>
-                <Input
-                  id="title"
-                  placeholder="เช่น ค่าชาบูร้านโปรด, ค่าทริปวันหยุด"
-                  value={billData.title}
-                  onChange={(e) => setBillData((prev) => ({ ...prev, title: e.target.value }))}
-                  required
-                  className="
-                    h-12 bg-secondary/40 border-border
-                    focus:border-indigo-500/70 focus:ring-1 focus:ring-indigo-500/50
-                    text-foreground placeholder:text-muted-foreground/60
-                    rounded-xl transition-all font-medium
-                  "
-                />
-              </div>
+            {/* ชื่อบิล */}
+            <div className="space-y-1.5">
+              <Label htmlFor="title" className="text-[11px] font-bold text-muted-foreground/80 pl-0.5 uppercase tracking-wider">
+                ชื่อบิลเรียกเก็บ
+              </Label>
+              <Input
+                id="title"
+                placeholder="เช่น ค่าชาบูร้านโปรด, ค่าทริปวันหยุด"
+                value={billData.title}
+                onChange={(e) => setBillData((prev) => ({ ...prev, title: e.target.value }))}
+                required
+                className="
+                  h-11 bg-secondary/40 border-border
+                  focus:border-indigo-500/70 focus:ring-1 focus:ring-indigo-500/50
+                  text-foreground placeholder:text-muted-foreground/60
+                  rounded-xl transition-all text-sm font-medium
+                "
+              />
+            </div>
 
-              {/* เบอร์พร้อมเพย์ */}
-              <div className="space-y-1.5">
-                <Label htmlFor="promptpay" className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
-                  <Phone className="h-3 w-3" /> เบอร์พร้อมเพย์ผู้รับเงิน
-                </Label>
-                <Input
-                  id="promptpay"
-                  inputMode="numeric"
-                  placeholder="เช่น 0812345678 หรือเลขบัตรประชาชน"
-                  value={billData.payeePromptPayId}
-                  onChange={(e) => setBillData((prev) => ({ ...prev, payeePromptPayId: e.target.value }))}
-                  required
-                  className="
-                    h-12 bg-secondary/40 border-border
-                    focus:border-indigo-500/70 focus:ring-1 focus:ring-indigo-500/50
-                    text-foreground placeholder:text-muted-foreground/60
-                    rounded-xl transition-all font-mono
-                  "
-                />
-              </div>
+            {/* เบอร์พร้อมเพย์ */}
+            <div className="space-y-1.5">
+              <Label htmlFor="promptpay" className="text-[11px] font-bold text-muted-foreground/80 pl-0.5 uppercase tracking-wider flex items-center gap-1.5">
+                <Phone className="h-3 w-3" /> เบอร์พร้อมเพย์ผู้รับเงิน
+              </Label>
+              <Input
+                id="promptpay"
+                inputMode="numeric"
+                placeholder="เช่น 0812345678 หรือเลขบัตรประชาชน"
+                value={billData.payeePromptPayId}
+                onChange={(e) => setBillData((prev) => ({ ...prev, payeePromptPayId: e.target.value }))}
+                required
+                className="
+                  h-11 bg-secondary/40 border-border
+                  focus:border-indigo-500/70 focus:ring-1 focus:ring-indigo-500/50
+                  text-foreground placeholder:text-muted-foreground/60
+                  rounded-xl transition-all font-mono text-sm
+                "
+              />
             </div>
           </div>
 
           {/* --- Section: รายชื่อเพื่อน --- */}
-          <div className="bg-card border border-border rounded-2xl overflow-hidden">
+          <div className="bg-card border border-border rounded-2xl shadow-sm overflow-hidden">
             <div className="px-4 pt-4 pb-3 border-b border-border/50 flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <UserPlus className="h-4 w-4 text-indigo-400" />
+                <div className="bg-indigo-500/10 p-1.5 rounded-lg border border-indigo-500/15">
+                  <UserPlus className="h-4 w-4 text-indigo-400" />
+                </div>
                 <span className="text-sm font-bold text-foreground">รายชื่อเพื่อน</span>
-                <span className="bg-indigo-500/10 border border-indigo-500/25 text-indigo-400 text-[10px] font-bold px-2 py-0.5 rounded-full">
+                <span className="bg-indigo-500/10 border border-indigo-500/25 text-indigo-400 text-[10px] font-bold px-2.5 py-0.5 rounded-full">
                   {billData.items.length} คน
                 </span>
               </div>
@@ -231,53 +231,56 @@ export default function CreateBillPage() {
                 type="button"
                 onClick={addItem}
                 className="
-                  h-9 px-3 rounded-xl text-xs font-bold
+                  h-9 px-3.5 rounded-xl text-xs font-bold
                   bg-indigo-600 hover:bg-indigo-500
-                  text-white flex items-center gap-1.5
-                  active:scale-95 transition-all
+                  text-white flex items-center gap-1
+                  active:scale-95 transition-all shadow-sm shadow-indigo-600/10
                 "
               >
-                <Plus className="h-3.5 w-3.5" /> เพิ่มคน
+                <Plus className="h-3.5 w-3.5" />
+                <span>เพิ่มคน</span>
               </button>
             </div>
 
+            {/* แถวแนะนำหัวคอลัมน์ (ช่วยให้อ่านง่ายขึ้นและประหยัดพื้นที่แนวตั้ง ไม่เกิด Label ซ้ำกันในลูป) */}
+            <div className="px-4 pt-3 pb-1 flex items-center gap-2 text-[10px] font-bold text-muted-foreground/75 uppercase tracking-wider bg-secondary/20 border-b border-border/30">
+              <div className="w-6 flex-shrink-0 text-center">#</div>
+              <div className="flex-1 pl-1">ชื่อเพื่อน</div>
+              <div className="w-24 pl-1">ยอดเงิน (บาท)</div>
+              {billData.items.length > 1 && <div className="w-9 flex-shrink-0" />}
+            </div>
+
             {/* รายการเพื่อนแต่ละคน */}
-            <div className="divide-y divide-border/50">
+            <div className="divide-y divide-border/30 px-2 py-1.5 space-y-1">
               {billData.items.map((item, index) => (
                 <div
                   key={index}
-                  className="px-4 py-3.5 flex items-end gap-3 animate-in fade-in duration-150"
+                  className="px-2 py-1 flex items-center gap-2 animate-in fade-in duration-150"
                 >
-                  {/* ลำดับ */}
-                  <div className="w-7 h-7 rounded-lg bg-secondary border border-border flex items-center justify-center flex-shrink-0 mb-1">
-                    <span className="text-[11px] font-bold text-muted-foreground">{index + 1}</span>
+                  {/* ลำดับตัวเลขวงกลมมน */}
+                  <div className="w-6 h-6 rounded-full bg-secondary border border-border/80 flex items-center justify-center flex-shrink-0">
+                    <span className="text-[10px] font-bold text-muted-foreground">{index + 1}</span>
                   </div>
 
                   {/* ชื่อเพื่อน */}
-                  <div className="flex-1 space-y-1">
-                    <Label htmlFor={`name-${index}`} className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider">
-                      ชื่อ
-                    </Label>
+                  <div className="flex-1">
                     <Input
                       id={`name-${index}`}
-                      placeholder="ชื่อเพื่อน"
+                      placeholder="เช่น สมชาย, เกรซ"
                       value={item.name}
                       onChange={(e) => updateItem(index, "name", e.target.value)}
                       required
                       className="
-                        h-11 bg-secondary/40 border-border
+                        h-10 bg-secondary/40 border-border
                         focus:border-indigo-500/60 focus:ring-1 focus:ring-indigo-500/50
                         text-foreground placeholder:text-muted-foreground/60
-                        rounded-xl text-sm
+                        rounded-xl text-sm font-medium
                       "
                     />
                   </div>
 
                   {/* ยอดเงิน */}
-                  <div className="w-28 space-y-1">
-                    <Label htmlFor={`amount-${index}`} className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider">
-                      ยอด (฿)
-                    </Label>
+                  <div className="w-24">
                     <Input
                       id={`amount-${index}`}
                       type="number"
@@ -288,7 +291,7 @@ export default function CreateBillPage() {
                       onChange={(e) => updateItem(index, "amount", e.target.value)}
                       required
                       className="
-                        h-11 bg-secondary/40 border-border
+                        h-10 bg-secondary/40 border-border
                         focus:border-indigo-500/60 focus:ring-1 focus:ring-indigo-500/50
                         text-foreground placeholder:text-muted-foreground/60
                         rounded-xl font-mono text-sm
@@ -303,8 +306,8 @@ export default function CreateBillPage() {
                       onClick={() => removeItem(index)}
                       aria-label="ลบรายการนี้"
                       className="
-                        w-10 h-11 rounded-xl flex items-center justify-center flex-shrink-0
-                        text-muted-foreground hover:text-red-400
+                        w-9 h-10 rounded-xl flex items-center justify-center flex-shrink-0
+                        text-muted-foreground/50 hover:text-red-400
                         hover:bg-red-500/10 active:scale-95
                         transition-all
                       "
@@ -318,11 +321,11 @@ export default function CreateBillPage() {
 
             {/* สรุปยอดรวมชั่วคราว */}
             {temporaryTotal > 0 && (
-              <div className="mx-4 mb-4 mt-1 flex justify-between items-center p-3.5 bg-indigo-500/8 dark:bg-indigo-500/10 border border-indigo-500/20 rounded-xl">
+              <div className="mx-4 mb-4 mt-2.5 flex justify-between items-center p-3 bg-indigo-500/8 dark:bg-indigo-500/10 border border-indigo-500/20 rounded-xl">
                 <span className="text-xs font-bold text-indigo-400 flex items-center gap-1.5">
                   <Coins className="h-3.5 w-3.5" /> ยอดรวมทั้งหมด
                 </span>
-                <span className="text-base font-mono font-black text-indigo-400">
+                <span className="text-sm font-mono font-black text-indigo-400">
                   ฿{temporaryTotal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 </span>
               </div>
