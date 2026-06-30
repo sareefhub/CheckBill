@@ -3,26 +3,29 @@
 import { useState, useEffect } from "react"
 import { useParams } from "next/navigation"
 import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { ArrowLeft, CheckCircle, Clock, Sparkles, AlertCircle, PieChart, Users, DollarSign, Wallet } from "lucide-react"
+import { ArrowLeft, Trophy, Clock, Sparkles, Users, Wallet } from "lucide-react"
 import { billApi } from "@/lib/api"
 import { useToast } from "@/hooks/use-toast"
+import { MainLayout } from "@/layout/main-layout"
 
-// กำหนดประเภทข้อมูล
+// ============================================================
+// ประเภทข้อมูล
+// ============================================================
 interface BillItem {
   id: number
   displayName: string
   amount: number
   status: "PAID" | "UNPAID" | "PENDING"
   referenceCode?: string
+  paidAt?: string | null
 }
 
 interface Bill {
   id: number
   title: string
   publicSlug: string
+  payeeName?: string | null
   payeePromptPayId: string
   currency: string
   createdAt: string
@@ -50,7 +53,7 @@ export default function BillSummaryPage() {
       setLoading(true)
       const data: Bill = await billApi.getBillSummary(slug)
       setBill(data)
-    } catch (error) {
+    } catch {
       toast({
         title: "เกิดข้อผิดพลาด",
         description: "ไม่สามารถโหลดข้อมูลสรุปรายงานบิลได้",
@@ -63,186 +66,240 @@ export default function BillSummaryPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-slate-950 text-slate-100 flex items-center justify-center">
-        <p className="text-slate-400 animate-pulse text-lg">กำลังโหลดสรุปบิล...</p>
+      <div className="min-h-screen bg-background text-foreground flex items-center justify-center">
+        <div className="text-center space-y-3">
+          <div className="w-12 h-12 rounded-2xl bg-indigo-500/10 border border-indigo-500/25 flex items-center justify-center mx-auto animate-pulse">
+            <Trophy className="h-6 w-6 text-indigo-400" />
+          </div>
+          <p className="text-muted-foreground text-sm">กำลังโหลดสรุปบิล...</p>
+        </div>
       </div>
     )
   }
 
   if (!bill) {
     return (
-      <div className="min-h-screen bg-slate-950 text-slate-100 flex items-center justify-center">
-        <div className="text-center space-y-4">
-          <h1 className="text-2xl font-bold">ไม่พบข้อมูลของบิลนี้ในฐานข้อมูล</h1>
-          <Link href={`/bills/${slug}`}>
-            <Button className="bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 border-none text-white rounded-xl">กลับไปหน้าบิล</Button>
+      <div className="min-h-screen bg-background text-foreground flex items-center justify-center px-4">
+        <div className="text-center space-y-4 max-w-xs">
+          <div className="w-16 h-16 rounded-3xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-center mx-auto">
+            <Trophy className="h-8 w-8 text-rose-400" />
+          </div>
+          <div>
+            <h2 className="text-xl font-bold text-foreground">ไม่พบข้อมูล</h2>
+            <p className="text-muted-foreground text-sm mt-1">ไม่พบข้อมูลของบิลนี้ในระบบ</p>
+          </div>
+          <Link href="/">
+            <button className="w-full h-12 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 border-none text-white rounded-2xl font-bold transition-all">
+              กลับหน้าแรก
+            </button>
           </Link>
         </div>
       </div>
     )
   }
 
-  // คำนวณสรุปข้อมูลและประมวลผลตัวเลข
+  // คำนวณสรุปข้อมูล
   const totalItems = bill.items.length
   const paid = bill.items.filter((i) => i.status === "PAID")
   const unpaid = bill.items.filter((i) => i.status !== "PAID")
+  
   const paidAmount = paid.reduce((sum, i) => sum + Number(i.amount), 0)
   const unpaidAmount = unpaid.reduce((sum, i) => sum + Number(i.amount), 0)
   const totalAmount = paidAmount + unpaidAmount
   const completionRate = totalItems > 0 ? Math.round((paid.length / totalItems) * 100) : 0
 
+  // จัดเรียงคนที่จ่ายเงินแล้วเรียงตามวันเวลาที่โอนสำเร็จ (โอนไวแชมเปี้ยนชิพ!)
+  const sortedPaidItems = [...paid].sort((a, b) => {
+    if (!a.paidAt) return 1
+    if (!b.paidAt) return -1
+    return new Date(a.paidAt).getTime() - new Date(b.paidAt).getTime()
+  })
+
+  // สัญลักษณ์เหรียญรางวัล
+  const getTrophyEmoji = (index: number) => {
+    if (index === 0) return "🥇"
+    if (index === 1) return "🥈"
+    if (index === 2) return "🥉"
+    return `${index + 1}`
+  };
+
+  const getTrophyColorClass = (index: number) => {
+    if (index === 0) return "text-amber-500 bg-amber-500/10 border-amber-500/25"
+    if (index === 1) return "text-slate-400 bg-slate-400/10 border-slate-400/25"
+    if (index === 2) return "text-amber-700 bg-amber-700/10 border-amber-700/25"
+    return "text-muted-foreground bg-secondary/80 border-border"
+  }
+
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 relative overflow-hidden pb-12">
-      {/* แสงสปอตไลท์ตกแต่งพื้นหลัง */}
-      <div className="absolute top-[-15%] right-[-10%] w-[55%] h-[55%] rounded-full bg-violet-500/5 blur-[140px] pointer-events-none" />
-      <div className="absolute bottom-[-10%] left-[-10%] w-[45%] h-[45%] rounded-full bg-indigo-500/5 blur-[120px] pointer-events-none" />
-
-      <div className="container mx-auto px-4 py-8 max-w-4xl relative z-10">
-        
-        {/* ส่วนหัวหน้าจอ (Header) */}
-        <div className="mb-8">
+    <MainLayout>
+      {/* ส่วนหัวจอ (เหมือนหน้าดีเทลบิลเพื่อคุมธีม) */}
+      <div className="flex items-center justify-between gap-3 mb-4">
+        <div className="flex items-center gap-2 min-w-0">
           <Link href={`/bills/${slug}`}>
-            <Button variant="ghost" className="mb-4 text-slate-400 hover:text-white hover:bg-slate-900">
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              กลับไปหน้ารายละเอียดบิล
-            </Button>
+            <button
+              aria-label="ย้อนกลับ"
+              className="
+                w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0
+                bg-secondary/60 border border-border
+                hover:bg-secondary active:scale-95 transition-all
+                text-muted-foreground hover:text-foreground
+              "
+            >
+              <ArrowLeft className="h-5 w-5" />
+            </button>
           </Link>
-          <div className="flex items-center gap-3">
-            <div className="bg-indigo-600/10 p-2.5 rounded-2xl border border-indigo-500/20">
-              <PieChart className="h-6 w-6 text-indigo-400" />
-            </div>
-            <h1 className="text-3xl font-extrabold tracking-tight bg-gradient-to-r from-white to-slate-300 bg-clip-text text-transparent">
-              รายงานสรุปบิล: {bill.title}
-            </h1>
+          <div className="min-w-0">
+            <h1 className="text-base font-bold text-foreground truncate">สรุปยอดบิล: {bill.title}</h1>
+            <p className="text-xs text-muted-foreground font-mono">#{bill.publicSlug}</p>
           </div>
-          <p className="text-slate-500 mt-2 text-sm">
-            แสดงสถานะและภาพรวมการชำระเงินของบิลในรูปแบบสรุปเข้าใจง่าย
-          </p>
+        </div>
+      </div>
+
+      {/* --- Progress Bar --- */}
+      <div className="bg-card border border-border p-4 rounded-2xl space-y-3 mb-4">
+        <div className="flex items-center justify-between">
+          <span className="text-xs font-bold text-muted-foreground">ความคืบหน้าการจ่ายเงิน</span>
+          <span className="text-sm font-bold text-indigo-400">{completionRate}%</span>
         </div>
 
-        {/* แผงข้อมูลสถิติรวม (Stats Grid) */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-          
-          {/* สถิติ 1: เพื่อนทั้งหมด */}
-          <Card className="bg-slate-900/40 border-slate-800 backdrop-blur-md text-center">
-            <CardContent className="pt-6">
-              <div className="bg-indigo-500/10 w-10 h-10 rounded-lg flex items-center justify-center mx-auto mb-2.5">
-                <Users className="h-5 w-5 text-indigo-400" />
-              </div>
-              <div className="text-2xl font-black text-slate-200">{totalItems} คน</div>
-              <p className="text-xs text-slate-500 mt-1">ผู้ร่วมหารทั้งหมด</p>
-            </CardContent>
-          </Card>
-
-          {/* สถิติ 2: คนจ่ายแล้ว */}
-          <Card className="bg-slate-900/40 border-slate-800 backdrop-blur-md text-center">
-            <CardContent className="pt-6">
-              <div className="bg-emerald-500/10 w-10 h-10 rounded-lg flex items-center justify-center mx-auto mb-2.5">
-                <CheckCircle className="h-5 w-5 text-emerald-400" />
-              </div>
-              <div className="text-2xl font-black text-emerald-400">{paid.length} คน</div>
-              <p className="text-xs text-slate-500 mt-1">จ่ายครบเรียบร้อย</p>
-            </CardContent>
-          </Card>
-
-          {/* สถิติ 3: คนที่ยังไม่จ่าย */}
-          <Card className="bg-slate-900/40 border-slate-800 backdrop-blur-md text-center">
-            <CardContent className="pt-6">
-              <div className="bg-amber-500/10 w-10 h-10 rounded-lg flex items-center justify-center mx-auto mb-2.5">
-                <Clock className="h-5 w-5 text-amber-400" />
-              </div>
-              <div className="text-2xl font-black text-amber-400">{unpaid.length} คน</div>
-              <p className="text-xs text-slate-500 mt-1">ยังค้างชำระเงิน</p>
-            </CardContent>
-          </Card>
-
-          {/* สถิติ 4: ยอดบิลรวม */}
-          <Card className="bg-slate-900/40 border-slate-800 backdrop-blur-md text-center">
-            <CardContent className="pt-6">
-              <div className="bg-violet-500/10 w-10 h-10 rounded-lg flex items-center justify-center mx-auto mb-2.5">
-                <DollarSign className="h-5 w-5 text-violet-400" />
-              </div>
-              <div className="text-xl font-black text-slate-200">฿{totalAmount.toLocaleString()}</div>
-              <p className="text-xs text-slate-500 mt-1.5">ยอดบิลทั้งหมด</p>
-            </CardContent>
-          </Card>
-
+        {/* แถบ progress */}
+        <div className="w-full bg-secondary h-2.5 rounded-full overflow-hidden">
+          <div
+            className="bg-gradient-to-r from-indigo-500 to-violet-500 h-full rounded-full transition-all duration-700"
+            style={{ width: `${completionRate}%` }}
+          />
         </div>
 
-        {/* แผงแยกแยะสองฝั่ง (Paid list vs Unpaid list) */}
-        <div className="grid md:grid-cols-2 gap-6">
+        {/* สรุปตัวเลขสถิติภาพรวม */}
+        <div className="grid grid-cols-3 gap-2 pt-1">
+          <div className="text-center">
+            <p className="text-xs font-semibold text-muted-foreground/80">ยอดเงินรวม</p>
+            <p className="text-base font-mono font-bold text-foreground mt-0.5">฿{totalAmount.toLocaleString()}</p>
+          </div>
+          <div className="text-center border-x border-border/50">
+            <p className="text-xs font-semibold text-muted-foreground/80">ชำระแล้ว</p>
+            <p className="text-base font-mono font-bold text-emerald-500 mt-0.5">฿{paidAmount.toLocaleString()}</p>
+          </div>
+          <div className="text-center">
+            <p className="text-xs font-semibold text-muted-foreground/80">ค้างจ่าย</p>
+            <p className="text-base font-mono font-bold text-indigo-500 mt-0.5">฿{unpaidAmount.toLocaleString()}</p>
+          </div>
+        </div>
+      </div>
+
+      <div className="space-y-4">
+        
+        {/* --- ตารางแชมเปี้ยนโอนไว (🥇 🥈 🥉) --- */}
+        <div className="space-y-2">
+          <h2 className="text-sm font-bold text-foreground px-1 flex items-center gap-1.5">
+            <Trophy className="h-4 w-4 text-amber-500" />
+            โอนไวแชมเปี้ยนชิพ ({paid.length} คน)
+          </h2>
           
-          {/* ฝั่งคนจ่ายแล้ว (Paid List) */}
-          <Card className="bg-slate-900/40 border-slate-800 backdrop-blur-md shadow-xl">
-            <CardHeader className="border-b border-slate-800/50 pb-4 flex flex-row items-center gap-3">
-              <div className="bg-emerald-500/10 p-2 rounded-xl border border-emerald-500/20">
-                <CheckCircle className="h-5 w-5 text-emerald-400" />
-              </div>
-              <div>
-                <CardTitle className="text-base text-slate-200">ชำระแล้ว ({paid.length})</CardTitle>
-                <CardDescription className="text-xs text-slate-500">ยอดเงินรวม: ฿{paidAmount.toLocaleString()}</CardDescription>
-              </div>
-            </CardHeader>
-            <CardContent className="pt-4">
-              <div className="space-y-2 max-h-[380px] overflow-y-auto pr-1">
-                {paid.length ? (
-                  paid.map((i) => (
-                    <div key={i.id} className="flex justify-between items-center p-3 bg-emerald-500/5 border border-emerald-500/10 rounded-xl text-sm font-medium">
-                      <div className="flex flex-col">
-                        <span className="text-slate-200">{i.displayName}</span>
-                        {i.referenceCode && (
-                          <span className="text-[10px] text-slate-500 font-mono mt-0.5 break-all">Ref: {i.referenceCode.substring(0, 18)}...</span>
-                        )}
-                      </div>
-                      <span className="font-bold text-emerald-400 font-mono">฿{i.amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+          <div className="space-y-2">
+            {sortedPaidItems.length > 0 ? (
+              sortedPaidItems.map((item, index) => {
+                const trophyClass = getTrophyColorClass(index)
+                return (
+                  <div 
+                    key={item.id} 
+                    className="
+                      bg-card border border-border rounded-2xl p-3 px-4
+                      flex items-center gap-3 transition-all
+                      border-l-4 border-l-emerald-500/40
+                    "
+                  >
+                    {/* ถ้วยรางวัล/ลำดับ */}
+                    <div className={`
+                      w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 font-bold border
+                      ${trophyClass}
+                    `}>
+                      {getTrophyEmoji(index)}
                     </div>
-                  ))
-                ) : (
-                  <div className="text-center py-10 text-slate-600 text-sm">
-                    <Wallet className="h-8 w-8 mx-auto mb-2 text-slate-700" />
-                    ยังไม่มีใครทำรายการจ่ายเงินเข้ามาครับ
-                  </div>
-                )}
-              </div>
-            </CardContent>
-          </Card>
 
-          {/* ฝั่งยังไม่จ่าย (Unpaid List) */}
-          <Card className="bg-slate-900/40 border-slate-800 backdrop-blur-md shadow-xl">
-            <CardHeader className="border-b border-slate-800/50 pb-4 flex flex-row items-center gap-3">
-              <div className="bg-amber-500/10 p-2 rounded-xl border border-amber-500/20">
-                <Clock className="h-5 w-5 text-amber-400" />
-              </div>
-              <div>
-                <CardTitle className="text-base text-slate-200">ยังไม่จ่าย ({unpaid.length})</CardTitle>
-                <CardDescription className="text-xs text-slate-500">ยอดเงินค้าง: ฿{unpaidAmount.toLocaleString()}</CardDescription>
-              </div>
-            </CardHeader>
-            <CardContent className="pt-4">
-              <div className="space-y-2 max-h-[380px] overflow-y-auto pr-1">
-                {unpaid.length ? (
-                  unpaid.map((i) => (
-                    <div key={i.id} className="flex justify-between items-center p-3 bg-amber-500/5 border border-amber-500/10 rounded-xl text-sm font-medium">
-                      <div className="flex flex-col">
-                        <span className="text-slate-200">{i.displayName}</span>
-                        <span className="text-[10px] text-amber-500/60 mt-0.5">รอการชำระเงิน</span>
-                      </div>
-                      <span className="font-bold text-amber-400 font-mono">฿{i.amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                    {/* ชื่อ + เวลาจ่าย */}
+                    <div className="flex-1 min-w-0">
+                      <p className="font-bold text-foreground text-sm truncate">{item.displayName}</p>
+                      <p className="text-[11px] text-muted-foreground/80 mt-0.5 flex items-center gap-1">
+                        <Clock className="h-3 w-3 text-emerald-500" />
+                        {item.paidAt 
+                          ? `โอนเมื่อ ${new Date(item.paidAt).toLocaleTimeString("th-TH", {hour: '2-digit', minute:'2-digit'})} น.` 
+                          : "จ่ายเงินสำเร็จแล้ว"
+                        }
+                      </p>
                     </div>
-                  ))
-                ) : (
-                  <div className="text-center py-10 text-emerald-400 text-sm font-semibold flex flex-col items-center justify-center gap-2">
-                    <Sparkles className="h-8 w-8 text-emerald-400 animate-bounce" />
-                    <span>เย้! ทุกคนชำระเงินครบหมดแล้ว 100%</span>
-                  </div>
-                )}
-              </div>
-            </CardContent>
-          </Card>
 
+                    {/* ยอดเงินโอน */}
+                    <span className="font-bold text-emerald-500 font-mono text-sm">
+                      ฿{item.amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                    </span>
+                  </div>
+                )
+              })
+            ) : (
+              <div className="text-center py-10 bg-card border border-border rounded-2xl text-muted-foreground text-sm font-medium">
+                <Wallet className="h-8 w-8 mx-auto mb-2 text-muted-foreground/50" />
+                ยังไม่มีการชำระเงินเข้ามาในบิลนี้ครับ
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* --- รายชื่อคนที่ยังไม่จ่าย --- */}
+        <div className="space-y-2">
+          <h2 className="text-sm font-bold text-foreground px-1">
+            ยังค้างชำระเงิน ({unpaid.length} คน)
+          </h2>
+
+          <div className="space-y-2">
+            {unpaid.length > 0 ? (
+              unpaid.map((item) => (
+                <div 
+                  key={item.id} 
+                  className="
+                    bg-card border border-border rounded-2xl p-3 px-4
+                    flex items-center justify-between gap-3
+                    border-l-4 border-l-rose-500/20
+                  "
+                >
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className="w-8 h-8 rounded-lg bg-rose-500/10 border border-rose-500/15 flex items-center justify-center flex-shrink-0 text-rose-400 font-bold text-xs">
+                      {item.status === "PENDING" ? "⏳" : "#"}
+                    </div>
+                    <div className="min-w-0">
+                      <p className="font-bold text-foreground text-sm truncate">{item.displayName}</p>
+                      <p className="text-[11px] text-muted-foreground/80 mt-0.5">
+                        {item.status === "PENDING" ? "รอยืนยันการชำระเงิน" : "รอการชำระเงิน"}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2 flex-shrink-0">
+                    <Badge className={`
+                      text-[10px] font-semibold h-5 px-1.5
+                      ${item.status === "PENDING" 
+                        ? "bg-amber-500/10 border-amber-500/30 text-amber-400" 
+                        : "bg-rose-500/10 border-rose-500/30 text-rose-400"
+                      }
+                    `}>
+                      {item.status === "PENDING" ? "รอยืนยัน" : "ยังไม่จ่าย"}
+                    </Badge>
+                    <span className="font-bold text-foreground font-mono text-sm">
+                      ฿{item.amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                    </span>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div className="text-center py-6 bg-card border border-border rounded-2xl text-emerald-500 text-sm font-semibold flex flex-col items-center justify-center gap-2 shadow-sm">
+                <Sparkles className="h-7 w-7 text-emerald-500 animate-bounce" />
+                <span>เย้! ทุกคนชำระเงินครบหมดเรียบร้อยแล้วครับ 🥇</span>
+              </div>
+            )}
+          </div>
         </div>
 
       </div>
-    </div>
+    </MainLayout>
   )
 }
