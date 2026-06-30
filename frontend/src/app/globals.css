@@ -153,12 +153,16 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
+  /* บังคับ font-sans และ font-mono ให้เป็น Kanit ทั้งคู่ */
   --font-sans: var(--font-kanit);
+  --font-mono: var(--font-kanit);
 }
 
 @layer base {
   * {
     @apply border-border outline-ring/50;
+    /* บังคับใช้ Kanit ทุก element ไม่มีข้อยกเว้น */
+    font-family: var(--font-kanit), 'Kanit', sans-serif !important;
     /* เพิ่ม touch-action เพื่อให้ responsive บน mobile ดีขึ้น */
     touch-action: manipulation;
     -webkit-tap-highlight-color: transparent;
@@ -180,12 +184,19 @@
   /* ป้องกัน input zoom บน iOS (ต้องใช้ font-size >= 16px) */
   input, textarea, select {
     font-size: 16px !important;
+    font-family: var(--font-kanit), 'Kanit', sans-serif !important;
   }
 
   /* ปรับปุ่มให้กดง่ายบน mobile (minimum touch target 44px) */
   button, [role="button"] {
     min-height: 44px;
     cursor: pointer;
+    font-family: var(--font-kanit), 'Kanit', sans-serif !important;
+  }
+
+  /* Override Tailwind font-mono class ให้ใช้ Kanit แทน monospace */
+  .font-mono {
+    font-family: var(--font-kanit), 'Kanit', sans-serif !important;
   }
 }
 
