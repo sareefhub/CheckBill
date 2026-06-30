@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge"
 import { billApi, paymentApi, uploadSlip } from "@/lib/api"
 import { useToast } from "@/hooks/use-toast"
 import { Button } from "@/components/ui/button"
-import { ArrowLeft, Lock, Unlock, Copy, Check, FileText } from "lucide-react"
+import { ArrowLeft, Lock, Unlock, Copy, Check, FileText, Wallet } from "lucide-react"
 import QRCode from "qrcode"
 import { MainLayout } from "@/layout/main-layout"
 
@@ -269,36 +269,40 @@ export default function ViewBillPage() {
           <div className="grid grid-cols-3 gap-2 pt-1">
             <div className="text-center">
               <p className="text-xs font-semibold text-muted-foreground/80">รวม</p>
-              <p className="text-sm font-mono font-bold text-foreground">฿{total.toLocaleString(undefined, { minimumFractionDigits: 0 })}</p>
+              <p className="text-base font-mono font-bold text-foreground mt-0.5">฿{total.toLocaleString()}</p>
             </div>
             <div className="text-center border-x border-border/50">
               <p className="text-xs font-semibold text-muted-foreground/80">จ่ายแล้ว</p>
-              <p className="text-sm font-mono font-bold text-emerald-400">฿{paid.toLocaleString(undefined, { minimumFractionDigits: 0 })}</p>
+              <p className="text-base font-mono font-bold text-emerald-500 mt-0.5">฿{paid.toLocaleString()}</p>
             </div>
             <div className="text-center">
               <p className="text-xs font-semibold text-muted-foreground/80">คงเหลือ</p>
-              <p className="text-sm font-mono font-bold text-indigo-400">฿{(total - paid).toLocaleString(undefined, { minimumFractionDigits: 0 })}</p>
+              <p className="text-base font-mono font-bold text-indigo-500 mt-0.5">฿{(total - paid).toLocaleString()}</p>
             </div>
           </div>
 
           {pending > 0 && (
             <div className="flex items-center justify-between bg-amber-500/8 border border-amber-500/20 rounded-xl px-3 py-2">
               <span className="text-[11px] text-amber-400 font-bold">⏳ รอยืนยัน</span>
-              <span className="text-xs font-mono font-bold text-amber-400">฿{pending.toLocaleString(undefined, { minimumFractionDigits: 0 })}</span>
+              <span className="text-xs font-mono font-bold text-amber-400">฿{pending.toLocaleString()}</span>
             </div>
           )}
         </div>
 
         <div className="grid grid-cols-2 gap-3">
-          <div className="bg-card border border-border rounded-2xl p-3 flex flex-col justify-center min-w-0">
-            <p className="text-xs font-semibold text-muted-foreground/80 mb-0.5">ผู้รับเงิน</p>
+          {/* PromptPay ID + Payee Name */}
+          <div className="bg-card border border-border rounded-2xl p-3 flex flex-col justify-between min-w-0">
+            <div className="flex items-center gap-1.5">
+              <Wallet className="h-4 w-4 text-indigo-400" />
+              <span className="text-xs font-semibold text-muted-foreground/80">ผู้รับเงิน</span>
+            </div>
             {bill.payeeName ? (
-              <>
+              <div className="mt-1">
                 <p className="text-xs font-bold text-foreground truncate leading-snug">{bill.payeeName}</p>
                 <p className="text-[11px] font-mono text-muted-foreground mt-0.5">{bill.payeePromptPayId}</p>
-              </>
+              </div>
             ) : (
-              <p className="text-sm font-mono font-bold text-foreground truncate">{bill.payeePromptPayId}</p>
+              <p className="text-sm font-mono font-bold text-foreground truncate mt-1">{bill.payeePromptPayId}</p>
             )}
           </div>
 

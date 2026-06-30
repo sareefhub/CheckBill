@@ -19,7 +19,7 @@ export function AdminPanel({
   return (
     <div className="space-y-2">
       <h2 className="text-xs font-semibold text-muted-foreground/80 px-1">เครื่องมือจัดการ</h2>
-      <div className="grid grid-cols-2 gap-3">
+      <div className={`grid ${billStatus === "OPEN" ? "grid-cols-2" : "grid-cols-1"} gap-3`}>
         <Link href={`/bills/${slug}/summary`} className="block">
           <button
             type="button"
