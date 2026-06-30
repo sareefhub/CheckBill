@@ -1,0 +1,53 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Bill {
+  id                BigInt     @id @default(autoincrement())
+  title             String     @db.VarChar(120)
+  payeePromptPayId  String     @map("payee_promptpay_id") @db.VarChar(30)
+  currency          String     @default("THB") @db.VarChar(8)
+  publicSlug        String     @unique @map("public_slug") @db.VarChar(64)
+  createdAt         DateTime   @default(now()) @map("created_at") @db.Timestamptz
+  closeAt           DateTime?  @map("close_at") @db.Timestamptz
+  items             BillItem[]
+
+  @@index([publicSlug], map: "idx_bills_slug")
+  @@map("bills")
+}
+
+model BillItem {
+  id            BigInt    @id @default(autoincrement())
+  billId        BigInt    @map("bill_id")
+  displayName   String    @map("display_name") @db.VarChar(80)
+  amount        Decimal   @db.Decimal(12, 2)
+  status        String    @default("UNPAID") @db.VarChar(16)
+  referenceCode String    @map("reference_code") @db.VarChar(64)
+  paidAt        DateTime? @map("paid_at") @db.Timestamptz
+  bill          Bill      @relation(fields: [billId], references: [id], onDelete: Cascade)
+  payments      Payment[]
+
+  @@index([billId], map: "idx_items_bill")
+  @@map("bill_items")
+}
+
+model Payment {
+  id             BigInt    @id @default(autoincrement())
+  billItemId     BigInt    @map("bill_item_id")
+  slipUrl        String    @map("slip_url")
+  bankRef        String?   @map("bank_ref") @db.VarChar(64)
+  detectedAmount Decimal?  @map("detected_amount") @db.Decimal(12, 2)
+  detectedTime   DateTime? @map("detected_time") @db.Timestamptz
+  verifyScore    Int       @default(0) @map("verify_score")
+  status         String    @default("SUBMITTED") @db.VarChar(16)
+  createdAt      DateTime  @default(now()) @map("created_at") @db.Timestamptz
+  billItem       BillItem  @relation(fields: [billItemId], references: [id], onDelete: Cascade)
+
+  @@index([billItemId], map: "idx_payments_item")
+  @@map("payments")
+}
