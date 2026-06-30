@@ -53,8 +53,14 @@ export default function ViewBillPage() {
   const [copied, setCopied] = useState(false)
   const [closingBill, setClosingBill] = useState(false)
 
-  // ควบคุมโมดัลต่างๆ
-  const [qrDialog, setQrDialog] = useState<{ open: boolean; data?: { amount?: number; referenceCode?: string }; qrImage?: string; loading?: boolean }>({ open: false })
+  // ควบคุมโมดัลต่างๆ (เพิ่มการเก็บข้อมูล item เพื่อส่งต่อไปยังหน้ารับสลิป)
+  const [qrDialog, setQrDialog] = useState<{ 
+    open: boolean 
+    item?: BillItem 
+    data?: { amount?: number; referenceCode?: string } 
+    qrImage?: string 
+    loading?: boolean 
+  }>({ open: false })
   const [uploadDialog, setUploadDialog] = useState<{ open: boolean; item?: BillItem; loading?: boolean }>({ open: false })
   const [slipPreviewDialog, setSlipPreviewDialog] = useState<{ open: boolean; slipUrl?: string; bankRef?: string; amount?: number; loading?: boolean }>({ open: false })
 
@@ -107,11 +113,14 @@ export default function ViewBillPage() {
 
   // เปิดโมดัล QR Code
   const handleViewQR = async (id: number) => {
-    setQrDialog({ open: true, loading: true })
+    // ค้นหาข้อมูลไอเทมของคนนี้เพื่อเก็บเข้า State ไว้สำหรับให้กดแนบสลิปต่อ
+    // แปลงเป็น String ทั้งคู่เพื่อความปลอดภัยในการเปรียบเทียบข้ามประเภทข้อมูล (เช่น string vs number จาก BigInt ของฐานข้อมูล)
+    const item = bill?.items.find((i) => String(i.id) === String(id))
+    setQrDialog({ open: true, item, loading: true })
     try {
       const data = await billApi.getItemQR(slug, id)
       const qrImage = await QRCode.toDataURL(data.promptpayPayload)
-      setQrDialog({ open: true, data, qrImage })
+      setQrDialog({ open: true, item, data, qrImage })
     } catch {
       toast({ title: "ผิดพลาด", description: "โหลด QR Code ไม่สำเร็จ", variant: "destructive" })
       setQrDialog({ open: false })
@@ -376,6 +385,11 @@ export default function ViewBillPage() {
           payeePromptPayId={bill.payeePromptPayId}
           amount={qrDialog.data ? (qrDialog.data.amount || null) : null}
           referenceCode={qrDialog.data ? (qrDialog.data.referenceCode || null) : null}
+          onUploadSlip={
+            qrDialog.item && qrDialog.item.status !== "PAID" && bill.status === "OPEN"
+              ? () => handleUploadSlipOpen(qrDialog.item!)
+              : undefined
+          }
         />
 
         {/* DIALOG 2: อัปโหลดสลิป */}

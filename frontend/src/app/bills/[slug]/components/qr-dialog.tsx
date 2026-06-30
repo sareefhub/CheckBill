@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { QrCode, Download } from "lucide-react"
+import { QrCode, Download, Upload } from "lucide-react"
 
 interface QrDialogProps {
   isOpen: boolean
@@ -13,6 +13,7 @@ interface QrDialogProps {
   payeePromptPayId: string
   amount: number | null
   referenceCode: string | null
+  onUploadSlip?: () => void
 }
 
 export function QrDialog({
@@ -24,6 +25,7 @@ export function QrDialog({
   payeePromptPayId,
   amount,
   referenceCode,
+  onUploadSlip,
 }: QrDialogProps) {
   const [downloading, setDownloading] = useState(false)
 
@@ -159,6 +161,20 @@ export function QrDialog({
                   <Download className="h-4 w-4" />
                   {downloading ? "กำลังดาวน์โหลด..." : "ดาวน์โหลดรูปภาพ QR"}
                 </button>
+
+                {/* ปุ่มแนบสลิปเพื่อแจ้งโอนเงิน สำหรับผู้ใช้งานที่สแกนจ่ายเงินเสร็จแล้ว */}
+                {onUploadSlip && (
+                  <button
+                    onClick={() => {
+                      onOpenChange(false)
+                      onUploadSlip()
+                    }}
+                    className="w-full max-w-[260px] flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold py-2.5 px-4 rounded-2xl shadow-lg shadow-emerald-600/10 hover:shadow-emerald-600/20 active:scale-[0.98] transition-all duration-200 cursor-pointer mt-1"
+                  >
+                    <Upload className="h-4 w-4" />
+                    แนบสลิปแจ้งโอนเงิน
+                  </button>
+                )}
               </>
             )
           )}
