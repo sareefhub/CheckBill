@@ -115,7 +115,7 @@ export default function HomePage() {
               onKeyDown={(e) => { if (e.key === "Enter") handleSearch() }}
               className="
                 flex-1 h-11 px-3.5 rounded-xl text-sm
-                bg-background border border-border
+                bg-secondary/40 border border-border
                 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/50
                 text-foreground placeholder:text-muted-foreground/70
                 transition-all outline-none
