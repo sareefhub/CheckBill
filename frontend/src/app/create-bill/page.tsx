@@ -162,7 +162,7 @@ export default function CreateBillPage() {
         </Link>
         <div>
           <h1 className="text-base font-bold text-foreground">สร้างบิลใหม่</h1>
-          <p className="text-xs text-muted-foreground/80 mt-0.5">ระบุรายละเอียดบิลและเพื่อนร่วมหาร</p>
+          <p className="text-sm font-medium text-muted-foreground/90 mt-0.5">ระบุรายละเอียดบิลและเพื่อนร่วมหาร</p>
         </div>
       </div>
 
@@ -178,24 +178,24 @@ export default function CreateBillPage() {
               <div className="bg-indigo-500/10 p-1.5 rounded-lg border border-indigo-500/15">
                 <Wallet className="h-4 w-4 text-indigo-400" />
               </div>
-              <span className="text-sm font-semibold text-foreground">รายละเอียดบิล</span>
+              <span className="text-sm font-bold text-foreground">รายละเอียดบิล</span>
             </div>
 
             {/* ชื่อบิล */}
             <div className="space-y-1.5">
-              <Label htmlFor="title" className="text-xs font-medium text-muted-foreground pl-0.5">
+              <Label htmlFor="title" className="text-sm font-bold text-foreground/90 pl-0.5">
                 ชื่อบิลหรือรายการเรียกเก็บ
               </Label>
               <Input
                 id="title"
-                placeholder="เช่น ค่าอาหารมื้อพิเศษ, ค่าทริปวันหยุด"
+                placeholder="เช่น ค่าอาหารมื้อพิเศษ, ค่าทริปท่องเที่ยว"
                 value={billData.title}
                 onChange={(e) => setBillData((prev) => ({ ...prev, title: e.target.value }))}
                 required
                 className="
                   h-11 bg-secondary/40 border-border
                   focus:border-indigo-500/70 focus:ring-1 focus:ring-indigo-500/50
-                  text-foreground placeholder:text-muted-foreground/60
+                  text-foreground placeholder:text-muted-foreground/75
                   rounded-xl transition-all text-sm font-normal
                 "
               />
@@ -203,7 +203,7 @@ export default function CreateBillPage() {
 
             {/* เบอร์พร้อมเพย์ */}
             <div className="space-y-1.5">
-              <Label htmlFor="promptpay" className="text-xs font-medium text-muted-foreground pl-0.5 flex items-center gap-1.5">
+              <Label htmlFor="promptpay" className="text-sm font-bold text-foreground/90 pl-0.5 flex items-center gap-1.5">
                 <Phone className="h-3 w-3" /> หมายเลขพร้อมเพย์ผู้รับเงิน
               </Label>
               <Input
@@ -216,7 +216,7 @@ export default function CreateBillPage() {
                 className="
                   h-11 bg-secondary/40 border-border
                   focus:border-indigo-500/70 focus:ring-1 focus:ring-indigo-500/50
-                  text-foreground placeholder:text-muted-foreground/60
+                  text-foreground placeholder:text-muted-foreground/75
                   rounded-xl transition-all font-mono text-sm font-normal
                 "
               />
@@ -230,8 +230,8 @@ export default function CreateBillPage() {
                 <div className="bg-indigo-500/10 p-1.5 rounded-lg border border-indigo-500/15">
                   <UserPlus className="h-4 w-4 text-indigo-400" />
                 </div>
-                <span className="text-sm font-semibold text-foreground">รายชื่อเพื่อนร่วมหาร</span>
-                <span className="bg-indigo-500/10 border border-indigo-500/25 text-indigo-400 text-xs font-semibold px-2.5 py-0.5 rounded-full">
+                <span className="text-sm font-bold text-foreground">รายชื่อเพื่อนร่วมหาร</span>
+                <span className="bg-indigo-500/10 border border-indigo-500/25 text-indigo-400 text-xs font-bold px-2.5 py-0.5 rounded-full">
                   {billData.items.length} คน
                 </span>
               </div>
@@ -239,7 +239,7 @@ export default function CreateBillPage() {
                 type="button"
                 onClick={addItem}
                 className="
-                  h-9 px-3.5 rounded-xl text-xs font-semibold
+                  h-9 px-3.5 rounded-xl text-sm font-semibold
                   bg-indigo-600 hover:bg-indigo-500
                   text-white flex items-center gap-1
                   active:scale-95 transition-all shadow-sm shadow-indigo-600/10
@@ -251,7 +251,7 @@ export default function CreateBillPage() {
             </div>
 
             {/* แถวแนะนำหัวคอลัมน์ */}
-            <div className="px-4 pt-2.5 pb-1 flex items-center gap-2 text-xs font-semibold text-muted-foreground/70 bg-secondary/20 border-b border-border/30">
+            <div className="px-4 pt-2.5 pb-1 flex items-center gap-2 text-xs font-bold text-muted-foreground/80 bg-secondary/20 border-b border-border/30">
               <div className="w-6 flex-shrink-0 text-center">#</div>
               <div className="flex-1 pl-1">ชื่อเพื่อนร่วมหาร</div>
               <div className="w-24 pl-1">ยอดเงิน (บาท)</div>
@@ -267,7 +267,7 @@ export default function CreateBillPage() {
                 >
                   {/* ลำดับตัวเลขวงกลมมน */}
                   <div className="w-6 h-6 rounded-full bg-secondary border border-border/80 flex items-center justify-center flex-shrink-0">
-                    <span className="text-xs font-semibold text-muted-foreground/80">{index + 1}</span>
+                    <span className="text-xs font-medium text-muted-foreground/90">{index + 1}</span>
                   </div>
 
                   {/* ชื่อเพื่อน */}
@@ -281,7 +281,7 @@ export default function CreateBillPage() {
                       className="
                         h-10 bg-secondary/40 border-border
                         focus:border-indigo-500/60 focus:ring-1 focus:ring-indigo-500/50
-                        text-foreground placeholder:text-muted-foreground/60
+                        text-foreground placeholder:text-muted-foreground/75
                         rounded-xl text-sm font-normal
                       "
                     />
@@ -301,7 +301,7 @@ export default function CreateBillPage() {
                       className="
                         h-10 bg-secondary/40 border-border
                         focus:border-indigo-500/60 focus:ring-1 focus:ring-indigo-500/50
-                        text-foreground placeholder:text-muted-foreground/60
+                        text-foreground placeholder:text-muted-foreground/75
                         rounded-xl font-mono text-sm font-normal
                         [appearance:textfield]
                         [&::-webkit-outer-spin-button]:appearance-none
@@ -333,10 +333,10 @@ export default function CreateBillPage() {
             {/* สรุปยอดรวมชั่วคราว */}
             {temporaryTotal > 0 && (
               <div className="mx-4 mb-4 mt-2.5 flex justify-between items-center p-3 bg-indigo-500/8 dark:bg-indigo-500/10 border border-indigo-500/20 rounded-xl">
-                <span className="text-xs font-semibold text-indigo-400 flex items-center gap-1.5">
-                  <Coins className="h-3.5 w-3.5" /> ยอดเงินรวมทั้งหมด
+                <span className="text-sm font-bold text-indigo-400 flex items-center gap-1.5">
+                  <Coins className="h-4 w-4 text-indigo-400" /> ยอดเงินรวมทั้งหมด
                 </span>
-                <span className="text-sm font-mono font-bold text-indigo-400">
+                <span className="text-base font-mono font-bold text-indigo-400">
                   ฿{temporaryTotal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 </span>
               </div>
