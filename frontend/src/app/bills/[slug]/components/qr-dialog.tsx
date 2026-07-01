@@ -1,8 +1,8 @@
 "use client"
 
-import { useState } from "react"
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { QrCode, Download, Upload } from "lucide-react"
+import { useState, useEffect } from "react"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
+import { QrCode } from "lucide-react"
 
 interface QrDialogProps {
   isOpen: boolean
@@ -25,14 +25,23 @@ export function QrDialog({
   amount,
   referenceCode,
 }: QrDialogProps) {
-  const [downloading, setDownloading] = useState(false)
+  const [combinedImage, setCombinedImage] = useState<string | null>(null)
+  const [generatingImage, setGeneratingImage] = useState(false)
 
-  // ฟังก์ชันช่วยดาวน์โหลดรูปภาพ QR Code ที่รวมหัวกระดาษและโลโก้ตรงกลางเข้าด้วยกัน
-  const handleDownload = async () => {
+  // เริ่มต้นกระบวนการรวมภาพ QR Code เมื่อเปิดหน้าต่างขึ้นมา
+  useEffect(() => {
+    if (isOpen && qrImage) {
+      generateCombinedImage()
+    } else {
+      setCombinedImage(null)
+    }
+  }, [isOpen, qrImage])
+
+  // ฟังก์ชันวาดรวมแบนเนอร์และ QR Code เข้าด้วยกันเป็นรูปภาพเดียวแบบไดนามิก
+  const generateCombinedImage = async () => {
     if (!qrImage) return
-    setDownloading(true)
+    setGeneratingImage(true)
 
-    // ฟังก์ชันสร้าง Image object และจัดการ CORS สำหรับดึงรูปภาพมาวาดบน Canvas
     const loadImage = (src: string): Promise<HTMLImageElement> => {
       return new Promise((resolve, reject) => {
         const img = new Image()
@@ -44,7 +53,7 @@ export function QrDialog({
     }
 
     try {
-      // โหลดรูปภาพที่เกี่ยวข้องทั้งหมด (หัวกระดาษ, ตัว QR Code, และไอคอนพร้อมเพย์ขนาดเล็ก)
+      // โหลดแบนเนอร์, QR Code และโลโก้พร้อมเพย์
       const [headerImg, qrImg, iconImg] = await Promise.all([
         loadImage("/images/thai_qr_payment.png"),
         loadImage(qrImage),
@@ -55,33 +64,30 @@ export function QrDialog({
       const ctx = canvas.getContext("2d")
       if (!ctx) throw new Error("Could not get canvas context")
 
-      // กำหนดความกว้างของรูปที่เซฟ (600px เพื่อความคมชัดในการสแกนผ่านมือถือ)
       const canvasWidth = 600
-      
-      // คำนวณความสูงของ Header และส่วนของ QR Code
       const headerHeight = (canvasWidth / headerImg.naturalWidth) * headerImg.naturalHeight
-      const qrHeight = canvasWidth // ตัว QR code เป็นทรงจัตุรัส
+      const qrHeight = canvasWidth
       const canvasHeight = headerHeight + qrHeight
 
       canvas.width = canvasWidth
       canvas.height = canvasHeight
 
-      // วาดพื้นหลังขาวให้กับการ์ด
+      // วาดพื้นหลังการ์ดสีขาว
       ctx.fillStyle = "#FFFFFF"
       ctx.fillRect(0, 0, canvasWidth, canvasHeight)
 
-      // วาดแบนเนอร์ด้านบน (Thai QR Payment Header)
+      // วาดหัวกระดาษ Thai QR Payment
       ctx.drawImage(headerImg, 0, 0, canvasWidth, headerHeight)
 
-      // วาดภาพ QR Code หลัก
+      // วาด QR Code
       ctx.drawImage(qrImg, 0, headerHeight, canvasWidth, qrHeight)
 
-      // วาดโลโก้พร้อมเพย์ตรงกลางของ QR Code เพื่อความถูกต้องตามมาตรฐาน
-      const iconSize = canvasWidth * 0.12 // อัตราส่วน 12% ของขนาด QR
+      // วาดโลโก้พร้อมเพย์ตรงกลาง QR Code
+      const iconSize = canvasWidth * 0.12
       const iconX = (canvasWidth - iconSize) / 2
       const iconY = headerHeight + (qrHeight - iconSize) / 2
 
-      // ทำกรอบสี่เหลี่ยมสีขาวมนมุมรอบตัวโลโก้เพื่อให้ตัดกับลวดลายของ QR Code
+      // ทำขอบสีขาวมนมุมรอบโลโก้
       const padding = 6
       const bgX = iconX - padding
       const bgY = iconY - padding
@@ -97,32 +103,27 @@ export function QrDialog({
       }
       ctx.fill()
 
-      // วาดตัวไอคอนลงบน Canvas
+      // วาดตัวไอคอนพร้อมเพย์ลงไป
       ctx.drawImage(iconImg, iconX, iconY, iconSize, iconSize)
 
-      // แปลงข้อมูล Canvas เป็น Data URL (PNG) และทำปุ่มดาวน์โหลดอัตโนมัติ
+      // แปลง Canvas เป็น Data URL (Base64 PNG) เพื่อนำไปใส่ในแท็ก img
       const dataUrl = canvas.toDataURL("image/png")
-      const link = document.createElement("a")
-      
-      const formattedAmount = amount !== null ? amount.toFixed(2) : "payment"
-      link.download = `PromptPay-QR-${formattedAmount}.png`
-      link.href = dataUrl
-      document.body.appendChild(link)
-      link.click()
-      document.body.removeChild(link)
+      setCombinedImage(dataUrl)
     } catch (error) {
-      console.error("เกิดข้อผิดพลาดในการสร้างไฟล์ดาวน์โหลด QR Code:", error)
+      console.error("เกิดข้อผิดพลาดในการรวมภาพ QR Code:", error)
     } finally {
-      setDownloading(false)
+      setGeneratingImage(false)
     }
   }
+
+  const showLoading = loading || generatingImage
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className="bg-card border-border text-foreground max-w-[340px] mx-auto rounded-3xl">
         <DialogHeader>
           <DialogTitle className="text-foreground flex items-center gap-2">
-            <QrCode className="h-5 w-5 text-indigo-400" /> QR จ่ายเงิน
+            <QrCode className="h-5 w-5 text-indigo-600 dark:text-indigo-400" /> QR จ่ายเงิน
           </DialogTitle>
           <DialogDescription className="text-muted-foreground text-xs">
             เปิดแอปธนาคารสแกนเพื่อโอนเงินได้ทันที
@@ -130,35 +131,31 @@ export function QrDialog({
         </DialogHeader>
 
         <div className="flex flex-col items-center gap-4">
-          {loading ? (
+          {showLoading ? (
             <div className="py-12 flex flex-col items-center gap-3">
-              <div className="w-10 h-10 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center animate-pulse">
-                <QrCode className="h-5 w-5 text-indigo-400" />
+              <div className="w-10 h-10 rounded-2xl bg-indigo-500/5 border border-indigo-500/15 flex items-center justify-center animate-pulse">
+                <QrCode className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
               </div>
-              <p className="text-muted-foreground text-sm animate-pulse">กำลังสร้าง QR Code...</p>
+              <p className="text-muted-foreground text-sm animate-pulse">กำลังเตรียมภาพ QR Code...</p>
             </div>
           ) : (
-            qrImage && (
+            combinedImage && (
               <>
+                {/* แสดงภาพรวมสำเร็จรูปใบเดียว เพื่อให้ผู้ใช้กดค้างเพื่อบันทึกลงเครื่องได้ทันที */}
                 <div className="w-full max-w-[260px] bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-xl flex flex-col items-center animate-in zoom-in duration-200">
-                  <img src="/images/thai_qr_payment.png" alt="Thai QR Payment" className="w-full h-auto object-contain" />
-                  <div className="relative w-full bg-white">
-                    <img src={qrImage} alt="PromptPay QR" className="w-full h-auto block" />
-                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white p-[3px] rounded-lg shadow-sm">
-                      <img src="/images/icon-thaiqr.png" alt="Thai QR Icon" className="w-8 h-8 object-contain" />
-                    </div>
-                  </div>
+                  <img src={combinedImage} alt="PromptPay QR Code" className="w-full h-auto block object-contain" />
                 </div>
 
-                {/* ปุ่มดาวน์โหลดรูปภาพ QR Code ที่รวมแบนเนอร์และโลโก้ในรูปเดียวสำเร็จรูป */}
-                <button
-                  onClick={handleDownload}
-                  disabled={downloading}
-                  className="w-full max-w-[260px] flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold py-2.5 px-4 rounded-2xl shadow-lg shadow-indigo-600/10 hover:shadow-indigo-600/20 active:scale-[0.98] transition-all duration-200 disabled:opacity-50 disabled:pointer-events-none cursor-pointer"
-                >
-                  <Download className="h-4 w-4" />
-                  {downloading ? "กำลังดาวน์โหลด..." : "ดาวน์โหลดรูปภาพ QR"}
-                </button>
+                {/* กล่องข้อความแนะนำผู้ใช้ในการบันทึกภาพลงเครื่อง */}
+                <div className="w-full max-w-[260px] bg-indigo-500/5 border border-indigo-500/15 rounded-2xl p-3 text-center">
+                  <p className="text-[11px] font-bold text-indigo-600 dark:text-indigo-400">
+                    💡 วิธีบันทึกรูปภาพลงคลังภาพ
+                  </p>
+                  <p className="text-[10px] text-muted-foreground/90 mt-1 leading-relaxed">
+                    <strong>กดค้างที่รูปภาพ QR Code ด้านบน</strong><br />
+                    แล้วเลือกเมนู <strong>&quot;บันทึกรูปภาพ&quot;</strong> หรือ <strong>&quot;เพิ่มไปยังแอปรูปภาพ&quot;</strong>
+                  </p>
+                </div>
               </>
             )
           )}
