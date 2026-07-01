@@ -17,6 +17,58 @@ interface VerifySlipDialogProps {
   onSubmit: (file: File, bankRef: string, amount: string) => Promise<void>
 }
 
+// ฟังก์ชันสำหรับบีบอัดรูปภาพที่ฝั่งผู้ใช้งาน (Client-side Image Compression)
+// ช่วยลดขนาดรูปภาพสลิปขนาดใหญ่ (เช่น 3-10MB จากรูปถ่าย) ให้เหลือไม่กี่ร้อย KB ก่อนส่งขึ้นเซิร์ฟเวอร์
+function compressImage(file: File, maxWidth = 900, maxHeight = 1200, quality = 0.85): Promise<File> {
+  return new Promise((resolve) => {
+    const reader = new FileReader()
+    reader.readAsDataURL(file)
+    reader.onload = (event) => {
+      const img = new Image()
+      img.src = event.target?.result as string
+      img.onload = () => {
+        const canvas = document.createElement("canvas")
+        let width = img.width
+        let height = img.height
+
+        // คำนวณอัตราส่วนเพื่อรักษารูปทรงเดิม
+        if (width > height) {
+          if (width > maxWidth) {
+            height = Math.round((height * maxWidth) / width)
+            width = maxWidth
+          }
+        } else {
+          if (height > maxHeight) {
+            width = Math.round((width * maxHeight) / height)
+            height = maxHeight
+          }
+        }
+
+        canvas.width = width
+        canvas.height = height
+        const ctx = canvas.getContext("2d")
+        ctx?.drawImage(img, 0, 0, width, height)
+
+        canvas.toBlob(
+          (blob) => {
+            if (blob) {
+              const compressedFile = new File([blob], file.name.replace(/\.[^/.]+$/, "") + ".jpg", {
+                type: "image/jpeg",
+                lastModified: Date.now(),
+              })
+              resolve(compressedFile)
+            } else {
+              resolve(file) // หากบีบอัดล้มเหลว ให้ใช้ไฟล์เดิม
+            }
+          },
+          "image/jpeg",
+          quality
+        )
+      }
+    }
+  })
+}
+
 export function VerifySlipDialog({
   isOpen,
   onOpenChange,
@@ -96,8 +148,23 @@ export function VerifySlipDialog({
       toast({ title: "ข้อมูลไม่ครบถ้วน", description: "กรุณาระบุรหัสอ้างอิงและยอดเงินให้ครบถ้วนนะครับ", variant: "destructive" })
       return
     }
-    await onSubmit(selectedFile, bankRef.trim(), detectedAmount.trim())
-    handleCloseChange(false)
+
+    try {
+      // ทำการบีบอัดไฟล์ภาพก่อนทำการอัปโหลดเพื่อลดเวลาอัปโหลดและป้องกัน Connection Timeout/Payload size limit
+      const fileToSend = selectedFile.type.startsWith("image/")
+        ? await compressImage(selectedFile)
+        : selectedFile
+
+      await onSubmit(fileToSend, bankRef.trim(), detectedAmount.trim())
+      handleCloseChange(false)
+    } catch (err) {
+      console.error("บีบอัดรูปภาพล้มเหลว:", err)
+      toast({ 
+        title: "เกิดข้อผิดพลาด", 
+        description: "ไม่สามารถประมวลผลรูปภาพสลิปได้ กรุณาลองใหม่อีกครั้ง", 
+        variant: "destructive" 
+      })
+    }
   }
 
   return (
