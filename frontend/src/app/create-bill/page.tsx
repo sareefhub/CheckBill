@@ -183,8 +183,8 @@ export default function CreateBillPage() {
           {/* --- การ์ดหลัก: รายละเอียดบิล --- */}
           <div className="bg-card border border-border rounded-2xl p-4 space-y-4 shadow-sm relative overflow-hidden">
             <div className="flex items-center gap-2 px-0.5">
-              <div className="bg-indigo-500/10 p-1.5 rounded-lg border border-indigo-500/15">
-                <Wallet className="h-4 w-4 text-indigo-400" />
+              <div className="bg-indigo-500/5 p-1.5 rounded-lg border border-indigo-500/15">
+                <Wallet className="h-4 w-4 text-indigo-600 dark:text-indigo-400" />
               </div>
               <span className="text-sm font-bold text-foreground">รายละเอียดบิล</span>
             </div>
@@ -212,7 +212,7 @@ export default function CreateBillPage() {
             {/* ชื่อผู้รับเงิน */}
             <div className="space-y-1.5">
               <Label htmlFor="payeeName" className="text-sm font-bold text-foreground/90 pl-0.5 flex items-center gap-1.5">
-                <User className="h-3.5 w-3.5 text-indigo-400" /> ชื่อผู้รับเงิน (ชื่อบัญชีปลายทาง)
+                <User className="h-3.5 w-3.5 text-indigo-600 dark:text-indigo-400" /> ชื่อผู้รับเงิน (ชื่อบัญชีปลายทาง)
               </Label>
               <Input
                 id="payeeName"
@@ -256,11 +256,11 @@ export default function CreateBillPage() {
             {/* ส่วนหัวการ์ดที่รองรับ Responsive บนมือถือ */}
             <div className="px-4 pt-4 pb-3 border-b border-border/50 flex flex-wrap items-center justify-between gap-3">
               <div className="flex items-center gap-2 min-w-0">
-                <div className="bg-indigo-500/10 p-1.5 rounded-lg border border-indigo-500/15 flex-shrink-0">
-                  <UserPlus className="h-4 w-4 text-indigo-400" />
+                <div className="bg-indigo-500/5 p-1.5 rounded-lg border border-indigo-500/15 flex-shrink-0">
+                  <UserPlus className="h-4 w-4 text-indigo-600 dark:text-indigo-400" />
                 </div>
                 <span className="text-sm font-bold text-foreground truncate">รายชื่อเพื่อนร่วมหาร</span>
-                <span className="bg-indigo-500/10 border border-indigo-500/25 text-indigo-400 text-xs font-bold px-2 py-0.5 rounded-full flex-shrink-0">
+                <span className="bg-indigo-500/5 border border-indigo-500/15 text-indigo-600 dark:text-indigo-400 text-xs font-bold px-2 py-0.5 rounded-full flex-shrink-0">
                   {billData.items.length} คน
                 </span>
               </div>
@@ -361,11 +361,11 @@ export default function CreateBillPage() {
 
             {/* สรุปยอดรวมชั่วคราว */}
             {temporaryTotal > 0 && (
-              <div className="mx-4 mb-4 mt-2.5 flex justify-between items-center p-3 bg-indigo-500/8 dark:bg-indigo-500/10 border border-indigo-500/20 rounded-xl">
-                <span className="text-sm font-bold text-indigo-400 flex items-center gap-1.5">
-                  <Coins className="h-4 w-4 text-indigo-400" /> ยอดเงินรวมทั้งหมด
+              <div className="mx-4 mb-4 mt-2.5 flex justify-between items-center p-3 bg-indigo-500/5 dark:bg-indigo-500/10 border border-indigo-500/15 rounded-xl">
+                <span className="text-sm font-bold text-indigo-600 dark:text-indigo-400 flex items-center gap-1.5">
+                  <Coins className="h-4 w-4 text-indigo-600 dark:text-indigo-400" /> ยอดเงินรวมทั้งหมด
                 </span>
-                <span className="text-base font-mono font-bold text-indigo-400">
+                <span className="text-base font-mono font-bold text-indigo-600 dark:text-indigo-400">
                   ฿{temporaryTotal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 </span>
               </div>

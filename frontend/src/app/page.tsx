@@ -56,7 +56,7 @@ export default function HomePage() {
 
       {/* --- ส่วนหัวข้อหลัก Hero Section (กะทัดรัดสำหรับมือถือ) --- */}
       <div className="text-center space-y-2 pt-3 pb-1">
-        <h1 className="text-4xl font-extrabold tracking-tight bg-gradient-to-r from-foreground via-foreground/90 to-indigo-400 bg-clip-text text-transparent">
+        <h1 className="text-4xl font-extrabold tracking-tight bg-gradient-to-r from-foreground via-foreground/90 to-indigo-600 dark:to-indigo-400 bg-clip-text text-transparent">
           เช็คบิล
         </h1>
         <p className="text-base text-muted-foreground/90 font-medium leading-relaxed">
@@ -97,8 +97,8 @@ export default function HomePage() {
         ">
           {/* หัวข้อและไอคอนประกอบด้านบนเพื่อความเรียบร้อยและสื่อความหมายชัดเจน */}
           <div className="flex items-center gap-2 px-1">
-            <div className="bg-indigo-500/10 p-1.5 rounded-lg border border-indigo-500/15">
-              <Search className="h-4 w-4 text-indigo-400" />
+            <div className="bg-indigo-500/5 p-1.5 rounded-lg border border-indigo-500/15">
+              <Search className="h-4 w-4 text-indigo-600 dark:text-indigo-400" />
             </div>
             <p className="font-bold text-foreground text-sm">ดูบิลเดิมด้วยรหัส</p>
           </div>
@@ -116,7 +116,7 @@ export default function HomePage() {
               className="
                 flex-1 h-11 px-3.5 rounded-xl text-sm
                 bg-secondary/40 border border-border
-                focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/50
+                focus:border-primary focus:ring-1 focus:ring-primary/50
                 text-foreground placeholder:text-muted-foreground/70
                 transition-all outline-none
               "
@@ -126,7 +126,7 @@ export default function HomePage() {
               disabled={!slug.trim()}
               className="
                 h-11 px-4.5 rounded-xl
-                bg-indigo-600 hover:bg-indigo-500 text-white
+                bg-primary hover:bg-primary/90 text-primary-foreground
                 disabled:opacity-40 transition-all
                 flex-shrink-0 text-sm font-semibold
               "
@@ -143,7 +143,7 @@ export default function HomePage() {
           <div className="flex items-center justify-between px-1">
             {/* ปรับขนาดหัวข้อบิลล่าสุดให้อ่านง่ายขึ้น */}
             <h2 className="text-base font-bold text-foreground flex items-center gap-1.5">
-              <Clock className="h-4 w-4 text-indigo-400" />
+              <Clock className="h-4 w-4 text-indigo-600 dark:text-indigo-400" />
               บิลล่าสุด
             </h2>
             <button
@@ -174,15 +174,15 @@ export default function HomePage() {
                 <div className={`
                   w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0
                   ${b.role === "creator"
-                    ? "bg-indigo-500/10 border border-indigo-500/20"
+                    ? "bg-indigo-500/5 border border-indigo-500/15"
                     : "bg-secondary border border-border"}
                 `}>
-                  <Receipt className={`h-4 w-4 ${b.role === "creator" ? "text-indigo-400" : "text-muted-foreground"}`} />
+                  <Receipt className={`h-4 w-4 ${b.role === "creator" ? "text-indigo-600 dark:text-indigo-400" : "text-muted-foreground"}`} />
                 </div>
 
                 {/* ข้อมูลบิล */}
                 <div className="flex-1 min-w-0">
-                  <p className="text-base font-semibold text-foreground truncate group-hover:text-indigo-400 transition-colors">
+                  <p className="text-base font-semibold text-foreground truncate group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
                     {b.title}
                   </p>
                   <p className="text-xs text-muted-foreground/90 font-mono mt-0.5">
@@ -192,7 +192,7 @@ export default function HomePage() {
  
                 <div className="flex items-center gap-2 flex-shrink-0">
                   {b.role === "creator" ? (
-                    <Badge className="bg-indigo-500/10 border-indigo-500/25 text-indigo-400 text-[11px] font-medium h-5.5 px-1.5">
+                    <Badge className="bg-indigo-500/5 border-indigo-500/15 text-indigo-600 dark:text-indigo-400 text-[11px] font-medium h-5.5 px-1.5">
                       ผู้สร้าง
                     </Badge>
                   ) : (
@@ -200,7 +200,7 @@ export default function HomePage() {
                       ผู้เข้าดู
                     </Badge>
                   )}
-                  <ChevronRight className="h-4 w-4 text-muted-foreground group-hover:text-indigo-400 group-hover:translate-x-0.5 transition-all" />
+                  <ChevronRight className="h-4 w-4 text-muted-foreground group-hover:text-indigo-600 dark:group-hover:text-indigo-400 group-hover:translate-x-0.5 transition-all" />
                 </div>
               </Link>
             ))}
@@ -222,12 +222,12 @@ export default function HomePage() {
               key={step.num}
               className="flex items-start gap-4 p-4 bg-card border border-border rounded-2xl"
             >
-              <div className="bg-indigo-500/10 border border-indigo-500/25 rounded-xl w-10 h-10 flex items-center justify-center flex-shrink-0">
-                <span className="text-indigo-400 font-black text-base">{step.num}</span>
+              <div className="bg-indigo-500/5 border border-indigo-500/15 rounded-xl w-10 h-10 flex items-center justify-center flex-shrink-0">
+                <span className="text-indigo-600 dark:text-indigo-400 font-black text-base">{step.num}</span>
               </div>
               <div className="flex-1 min-w-0 pt-0.5">
                 <p className="font-bold text-foreground text-base flex items-center gap-1.5">
-                  <step.icon className="h-4 w-4 text-indigo-400" />
+                  <step.icon className="h-4 w-4 text-indigo-600 dark:text-indigo-400" />
                   {step.title}
                 </p>
                 <p className="text-muted-foreground/90 text-sm mt-1 leading-relaxed">{step.desc}</p>

@@ -172,7 +172,7 @@ export function VerifySlipDialog({
       <DialogContent className="bg-card border-border text-foreground max-w-[380px] mx-auto rounded-3xl">
         <DialogHeader>
           <DialogTitle className="text-foreground flex items-center gap-2">
-            <Upload className="h-5 w-5 text-emerald-400" />
+            <Upload className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
             ยืนยันการจ่าย — {item?.displayName}
           </DialogTitle>
           <DialogDescription className="text-muted-foreground text-xs">
@@ -220,12 +220,12 @@ export function VerifySlipDialog({
               onClick={handleMockScan}
               disabled={mockingScan}
               className="
-                w-full h-11 rounded-xl border border-indigo-500/25
-                bg-indigo-500/8 text-indigo-400 text-xs font-semibold
-                flex items-center justify-center gap-2
-                hover:bg-indigo-500/15 active:scale-[0.98] transition-all
-                disabled:opacity-50
-              "
+              w-full h-11 rounded-xl border border-indigo-500/15
+              bg-indigo-500/5 text-indigo-600 dark:text-indigo-400 text-xs font-semibold
+              flex items-center justify-center gap-2
+              hover:bg-indigo-500/10 active:scale-[0.98] transition-all
+              disabled:opacity-50
+            "
             >
               <RefreshCw className={`h-3.5 w-3.5 ${mockingScan ? "animate-spin" : ""}`} />
               {mockingScan ? "กำลังสแกน..." : "🔍 สแกนและกรอกข้อมูลอัตโนมัติ"}
