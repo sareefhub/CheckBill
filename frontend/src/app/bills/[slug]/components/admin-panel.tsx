@@ -31,7 +31,7 @@ export function AdminPanel({
               active:scale-[0.98] transition-all
             "
           >
-            <BarChart3 className="h-4 w-4 text-indigo-400" />
+            <BarChart3 className="h-4 w-4 text-indigo-600 dark:text-indigo-400" />
             ดูรายงาน
           </button>
         </Link>
@@ -42,10 +42,10 @@ export function AdminPanel({
             onClick={onCloseBill}
             disabled={closingBill}
             className="
-              w-full h-12 rounded-2xl border border-rose-500/20
-              bg-rose-500/8 flex items-center justify-center gap-2
-              text-sm font-semibold text-rose-400
-              hover:bg-rose-500/15 active:scale-[0.98] transition-all
+              w-full h-12 rounded-2xl border border-rose-500/15
+              bg-rose-500/5 flex items-center justify-center gap-2
+              text-sm font-semibold text-rose-600 dark:text-rose-400
+              hover:bg-rose-500/10 active:scale-[0.98] transition-all
               disabled:opacity-50
             "
           >

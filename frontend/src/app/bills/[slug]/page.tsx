@@ -251,11 +251,11 @@ export default function ViewBillPage() {
 
         <div className="flex items-center gap-2 flex-shrink-0">
           {bill.status === "OPEN" ? (
-            <Badge className="bg-emerald-500/10 border-emerald-500/30 text-emerald-400 text-xs gap-1 font-semibold">
+            <Badge className="bg-emerald-500/5 border-emerald-500/15 text-emerald-600 dark:text-emerald-400 text-xs gap-1 font-semibold">
               <Unlock className="h-3 w-3" /> เปิดอยู่
             </Badge>
           ) : (
-            <Badge className="bg-secondary border-border text-muted-foreground text-xs gap-1 font-semibold">
+            <Badge className="bg-secondary/60 border-border/80 text-muted-foreground/80 text-xs gap-1 font-semibold">
               <Lock className="h-3 w-3" /> ปิดแล้ว
             </Badge>
           )}
@@ -265,7 +265,7 @@ export default function ViewBillPage() {
         <div className="bg-card border border-border p-4 rounded-2xl space-y-3">
           <div className="flex items-center justify-between">
             <span className="text-xs font-bold text-muted-foreground">ความคืบหน้า</span>
-            <span className="text-sm font-bold text-indigo-400">{progressPercent}%</span>
+            <span className="text-sm font-bold text-indigo-600 dark:text-indigo-400">{progressPercent}%</span>
           </div>
 
           <div className="w-full bg-secondary h-2.5 rounded-full overflow-hidden">
@@ -282,18 +282,18 @@ export default function ViewBillPage() {
             </div>
             <div className="text-center border-x border-border/50">
               <p className="text-xs font-semibold text-muted-foreground/80">จ่ายแล้ว</p>
-              <p className="text-base font-mono font-bold text-emerald-500 mt-0.5">฿{paid.toLocaleString()}</p>
+              <p className="text-base font-mono font-bold text-emerald-600 dark:text-emerald-400 mt-0.5">฿{paid.toLocaleString()}</p>
             </div>
             <div className="text-center">
               <p className="text-xs font-semibold text-muted-foreground/80">คงเหลือ</p>
-              <p className="text-base font-mono font-bold text-indigo-500 mt-0.5">฿{(total - paid).toLocaleString()}</p>
+              <p className="text-base font-mono font-bold text-indigo-600 dark:text-indigo-400 mt-0.5">฿{(total - paid).toLocaleString()}</p>
             </div>
           </div>
 
           {pending > 0 && (
-            <div className="flex items-center justify-between bg-amber-500/8 border border-amber-500/20 rounded-xl px-3 py-2">
-              <span className="text-[11px] text-amber-400 font-bold">⏳ รอยืนยัน</span>
-              <span className="text-xs font-mono font-bold text-amber-400">฿{pending.toLocaleString()}</span>
+            <div className="flex items-center justify-between bg-amber-500/5 border border-amber-500/15 rounded-xl px-3 py-2">
+              <span className="text-[11px] text-amber-600 dark:text-amber-400 font-bold">⏳ รอยืนยัน</span>
+              <span className="text-xs font-mono font-bold text-amber-600 dark:text-amber-400">฿{pending.toLocaleString()}</span>
             </div>
           )}
         </div>
@@ -302,7 +302,7 @@ export default function ViewBillPage() {
           {/* PromptPay ID + Payee Name */}
           <div className="bg-card border border-border rounded-2xl p-3 flex flex-col justify-between min-w-0">
             <div className="flex items-center gap-1.5">
-              <Wallet className="h-4 w-4 text-indigo-400" />
+              <Wallet className="h-4 w-4 text-indigo-600 dark:text-indigo-400" />
               <span className="text-xs font-semibold text-muted-foreground/80">ผู้รับเงิน</span>
             </div>
             {bill.payeeName ? (
@@ -327,7 +327,7 @@ export default function ViewBillPage() {
           >
             <div className="flex flex-col justify-between min-w-0">
               <div className="flex items-center gap-1.5">
-                {copied ? <Check className="h-4 w-4 text-emerald-400" /> : <Copy className="h-4 w-4 text-indigo-400" />}
+                {copied ? <Check className="h-4 w-4 text-emerald-600 dark:text-emerald-400" /> : <Copy className="h-4 w-4 text-indigo-600 dark:text-indigo-400" />}
                 <span className="text-xs font-semibold text-muted-foreground/80">
                   {copied ? "คัดลอกแล้ว!" : "แชร์ลิงก์"}
                 </span>
@@ -336,8 +336,8 @@ export default function ViewBillPage() {
                 {copied ? "ลิงก์อยู่ในคลิปบอร์ด" : "กดเพื่อคัดลอก URL"}
               </p>
             </div>
-            <div className="bg-indigo-500/10 p-1.5 rounded-xl border border-indigo-500/10 flex-shrink-0">
-              <ChevronRight className="h-3.5 w-3.5 text-indigo-400" />
+            <div className="bg-indigo-500/5 p-1.5 rounded-xl border border-indigo-500/10 flex-shrink-0">
+              <ChevronRight className="h-3.5 w-3.5 text-indigo-600 dark:text-indigo-400" />
             </div>
           </button>
         </div>

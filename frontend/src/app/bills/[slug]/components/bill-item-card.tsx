@@ -36,18 +36,18 @@ export function BillItemCard({
   const statusConfig = {
     PAID: {
       badge: "จ่ายแล้ว ✓",
-      badgeClass: "bg-emerald-500/10 border-emerald-500/30 text-emerald-400",
-      cardBorder: "border-l-4 border-l-emerald-500/40",
+      badgeClass: "bg-emerald-500/5 border-emerald-500/15 text-emerald-600 dark:text-emerald-400",
+      cardBorder: "border-l-4 border-l-emerald-500/30",
     },
     PENDING: {
       badge: "รอยืนยัน...",
-      badgeClass: "bg-amber-500/10 border-amber-500/30 text-amber-400",
-      cardBorder: "border-l-4 border-l-amber-500/40",
+      badgeClass: "bg-amber-500/5 border-amber-500/15 text-amber-600 dark:text-amber-400",
+      cardBorder: "border-l-4 border-l-amber-500/30",
     },
     UNPAID: {
       badge: "ยังไม่จ่าย",
-      badgeClass: "bg-rose-500/10 border-rose-500/30 text-rose-400",
-      cardBorder: "border-l-4 border-l-rose-500/20",
+      badgeClass: "bg-rose-500/5 border-rose-500/15 text-rose-600 dark:text-rose-400",
+      cardBorder: "border-l-4 border-l-rose-500/15",
     },
   }
 
@@ -88,9 +88,9 @@ export function BillItemCard({
             onClick={() => onViewQR(item.id)}
             className="
               flex-1 h-11 rounded-xl flex items-center justify-center gap-1.5
-              bg-indigo-500/10 border border-indigo-500/25
-              text-indigo-400 text-xs font-semibold
-              hover:bg-indigo-500/20 active:scale-95 transition-all
+              bg-indigo-500/5 border border-indigo-500/15
+              text-indigo-600 dark:text-indigo-400 text-xs font-semibold
+              hover:bg-indigo-500/10 active:scale-95 transition-all
             "
           >
             <QrCode className="h-4 w-4" />
@@ -104,9 +104,9 @@ export function BillItemCard({
               onClick={() => onUploadSlip(item)}
               className="
                 flex-1 h-11 rounded-xl flex items-center justify-center gap-1.5
-                bg-emerald-500/10 border border-emerald-500/25
-                text-emerald-400 text-xs font-semibold
-                hover:bg-emerald-500/20 active:scale-95 transition-all
+                bg-emerald-500/5 border border-emerald-500/15
+                text-emerald-600 dark:text-emerald-400 text-xs font-semibold
+                hover:bg-emerald-500/10 active:scale-95 transition-all
               "
             >
               <Upload className="h-4 w-4" />
