@@ -385,11 +385,6 @@ export default function ViewBillPage() {
           payeePromptPayId={bill.payeePromptPayId}
           amount={qrDialog.data ? (qrDialog.data.amount || null) : null}
           referenceCode={qrDialog.data ? (qrDialog.data.referenceCode || null) : null}
-          onUploadSlip={
-            qrDialog.item && qrDialog.item.status !== "PAID" && bill.status === "OPEN"
-              ? () => handleUploadSlipOpen(qrDialog.item!)
-              : undefined
-          }
         />
 
         {/* DIALOG 2: อัปโหลดสลิป */}

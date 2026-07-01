@@ -17,7 +17,7 @@ if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma;
  * to avoid JSON serialization issues in Next.js response.
  */
 export function serializeData<T>(data: T): any {
-  return JSON.parse(
+  const serialized = JSON.parse(
     JSON.stringify(data, (key, value) => {
       if (typeof value === 'bigint') {
         return value.toString();
@@ -25,4 +25,25 @@ export function serializeData<T>(data: T): any {
       return value;
     })
   );
+
+  // จัดการเพิ่มฟิลด์ status ให้กับโมเดล Bill แบบไดนามิก
+  if (serialized && typeof serialized === 'object') {
+    const addStatusToBill = (obj: any) => {
+      if (obj && typeof obj === 'object') {
+        // หากพบว่าเป็นข้อมูลบิล (มี publicSlug และ payeePromptPayId)
+        if ('publicSlug' in obj && 'payeePromptPayId' in obj) {
+          // หากไม่มีเวลาปิดบิล (closeAt) ให้เป็น OPEN ไม่เช่นนั้นเป็น CLOSED
+          obj.status = obj.closeAt ? 'CLOSED' : 'OPEN';
+        }
+      }
+    };
+
+    if (Array.isArray(serialized)) {
+      serialized.forEach(addStatusToBill);
+    } else {
+      addStatusToBill(serialized);
+    }
+  }
+
+  return serialized;
 }
